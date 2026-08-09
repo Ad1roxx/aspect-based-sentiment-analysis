@@ -31,11 +31,27 @@ five predictions, and each head's softmax gives the per-aspect confidence the UI
 ├── api/                     # FastAPI service
 ├── frontend/                # React prediction page
 ├── tests/                   # pytest: model inference + API
+├── scripts/
+│   └── download_data.py     # fetch + checksum-verify the SemEval-2014 data
+├── data/                    # raw XML (gitignored, fetched by script)
 ├── explanations/            # per-sprint engineering notes
 └── .github/workflows/       # CI
 ```
 
+## Setup
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+python scripts/download_data.py
+```
+
+`requirements.txt` pins the CUDA 12.6 build of PyTorch for GPU training. Serving and CI run
+CPU-only and will use a separate dependency profile.
+
 ## Licence / data note
 
-The SemEval-2014 Task 4 dataset is third-party licensed and is **not** redistributed in this
-repository.
+The SemEval-2014 Task 4 dataset is third-party licensed and is **not** redistributed here.
+`scripts/download_data.py` fetches it from pinned upstream commits and verifies each file
+against a known SHA-256 digest. See [data/README.md](data/README.md).
