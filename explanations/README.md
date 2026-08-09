@@ -11,4 +11,4 @@ choice is recorded while it is still fresh rather than reconstructed afterwards.
 
 | Sprint | Topic | File |
 |---|---|---|
-| 01 | Data + model | _pending_ |
+| 01 | Data + model | [sprint-01.md](sprint-01.md) |
