@@ -8,8 +8,8 @@ step, the scheduler and the evaluation behind roughly a hundred constructor
 arguments. The loop below is about forty lines and there is nothing in it that
 cannot be explained.
 
-MLflow tracking is intentionally absent — that is the next sprint. This script
-trains, evaluates and saves; nothing more.
+Every run is recorded to MLflow (see tracking.py): params, per-epoch metrics,
+per-class F1, confusion matrices, and the model itself as a registered version.
 """
 
 from __future__ import annotations
@@ -18,15 +18,17 @@ import argparse
 import json
 import random
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from pathlib import Path
 
+import mlflow
 import numpy as np
 import torch
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
+import tracking
 from data import ASPECTS, IGNORE_INDEX, LABEL_NAMES, Example, load_splits
 from model import ENCODER_NAME, MAX_LENGTH, AspectSentimentModel, compute_loss
 
@@ -42,6 +44,11 @@ class Config:
     weight_decay: float = 0.01
     warmup_ratio: float = 0.1
     seed: int = 42
+    # Off by default on purpose. The test split is the estimate of how the model
+    # does on data it has never influenced; evaluating against it on every run
+    # while tuning turns it into a second validation set, and the number stops
+    # meaning anything. Turn it on deliberately, at the end.
+    eval_test: bool = False
 
 
 class AspectDataset(Dataset):
@@ -100,13 +107,19 @@ def evaluate(
     model: AspectSentimentModel,
     loader: DataLoader,
     device: torch.device,
-) -> dict[str, float]:
-    """Return validation loss plus per-aspect macro-F1.
+) -> tuple[dict[str, float], list[list[int]], list[list[int]]]:
+    """Return validation loss, per-aspect macro-F1, and the raw label/prediction
+    lists that confusion matrices and per-class reports are built from.
 
     Macro-F1 averages the F1 of each class equally, so a rare class counts as
     much as a common one. That is the point: 'absent' accounts for roughly 80%
     of labels, so plain accuracy would reward a model that never predicts a
     sentiment at all.
+
+    The raw lists are returned rather than recomputed later because the model is
+    already in eval mode with the data already batched — running the whole split
+    a second time just to draw a heatmap would be wasteful, and worse, would risk
+    scoring a model that had since been mutated.
     """
     model.eval()
     total_loss = 0.0
@@ -151,7 +164,7 @@ def evaluate(
         per_aspect.append(score)
 
     metrics["macro_f1"] = float(np.mean(per_aspect))
-    return metrics
+    return metrics, true_by_aspect, pred_by_aspect
 
 
 def save_artifact(
@@ -187,7 +200,7 @@ def train(config: Config) -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device: {device}")
 
-    train_examples, val_examples, _ = load_splits()
+    train_examples, val_examples, test_examples = load_splits()
     print(f"train: {len(train_examples)}  val: {len(val_examples)}")
 
     tokenizer = AutoTokenizer.from_pretrained(ENCODER_NAME)
@@ -240,44 +253,96 @@ def train(config: Config) -> None:
         num_training_steps=total_steps,
     )
 
-    print(f"steps: {total_steps} ({len(train_loader)} per epoch)\n")
-    started = time.time()
-    metrics: dict[str, float] = {}
+    print(f"steps: {total_steps} ({len(train_loader)} per epoch)")
+    print(f"tracking: {tracking.configure()}\n")
 
-    for epoch in range(1, config.epochs + 1):
-        model.train()
-        epoch_loss = 0.0
-
-        for batch in train_loader:
-            optimizer.zero_grad()
-
-            logits = model(
-                batch["input_ids"].to(device),
-                batch["attention_mask"].to(device),
-            )
-            loss = compute_loss(logits, batch["labels"].to(device))
-            loss.backward()
-
-            # Fine-tuning occasionally produces a very large gradient that would
-            # undo good weights in a single step. Clipping bounds the update.
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-
-            optimizer.step()
-            scheduler.step()
-            epoch_loss += loss.item()
-
-        metrics = evaluate(model, val_loader, device)
-        per_aspect = "  ".join(f"{a}={metrics[f'f1_{a}']:.3f}" for a in ASPECTS)
-        print(
-            f"epoch {epoch}/{config.epochs}  "
-            f"train_loss={epoch_loss / len(train_loader):.4f}  "
-            f"val_loss={metrics['val_loss']:.4f}  "
-            f"macro_f1={metrics['macro_f1']:.4f}"
+    with mlflow.start_run() as run:
+        # Params are the inputs to the run; tags are facts about the context it
+        # ran in. MLflow lets you filter and sort on both, which is what makes
+        # "show me every run with lr=3e-5 on the 4060" a query instead of a
+        # memory exercise.
+        mlflow.log_params(asdict(config))
+        mlflow.log_params(
+            {
+                "encoder": ENCODER_NAME,
+                "max_length": MAX_LENGTH,
+                "total_steps": total_steps,
+                "trainable_params": sum(
+                    p.numel() for p in model.parameters() if p.requires_grad
+                ),
+            }
         )
-        print(f"          {per_aspect}")
+        mlflow.set_tags(
+            tracking.environment_tags(len(train_examples), len(val_examples))
+        )
+        print(f"run_id: {run.info.run_id}\n")
 
-    print(f"\ntrained in {time.time() - started:.1f}s")
-    save_artifact(model, tokenizer, config, metrics)
+        started = time.time()
+        metrics: dict[str, float] = {}
+        true_by_aspect: list[list[int]] = []
+        pred_by_aspect: list[list[int]] = []
+
+        for epoch in range(1, config.epochs + 1):
+            model.train()
+            epoch_loss = 0.0
+
+            for batch in train_loader:
+                optimizer.zero_grad()
+
+                logits = model(
+                    batch["input_ids"].to(device),
+                    batch["attention_mask"].to(device),
+                )
+                loss = compute_loss(logits, batch["labels"].to(device))
+                loss.backward()
+
+                # Fine-tuning occasionally produces a very large gradient that
+                # would undo good weights in a single step. Clipping bounds it.
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
+                optimizer.step()
+                scheduler.step()
+                epoch_loss += loss.item()
+
+            train_loss = epoch_loss / len(train_loader)
+            metrics, true_by_aspect, pred_by_aspect = evaluate(model, val_loader, device)
+
+            # step=epoch turns these into a curve rather than a final number, so
+            # overfitting shows up as val_loss turning back up while train_loss
+            # keeps falling — visible in the MLflow chart, invisible in a summary.
+            mlflow.log_metrics({"train_loss": train_loss, **metrics}, step=epoch)
+
+            per_aspect = "  ".join(f"{a}={metrics[f'f1_{a}']:.3f}" for a in ASPECTS)
+            print(
+                f"epoch {epoch}/{config.epochs}  "
+                f"train_loss={train_loss:.4f}  "
+                f"val_loss={metrics['val_loss']:.4f}  "
+                f"macro_f1={metrics['macro_f1']:.4f}"
+            )
+            print(f"          {per_aspect}")
+
+        elapsed = time.time() - started
+        mlflow.log_metric("training_seconds", elapsed)
+        print(f"\ntrained in {elapsed:.1f}s")
+
+        tracking.log_evaluation(true_by_aspect, pred_by_aspect, "val")
+
+        if config.eval_test:
+            test_loader = DataLoader(
+                AspectDataset(test_examples),
+                batch_size=config.batch_size,
+                shuffle=False,
+                collate_fn=collate,
+            )
+            test_metrics, test_true, test_pred = evaluate(model, test_loader, device)
+            mlflow.log_metrics({f"test_{k}": v for k, v in test_metrics.items()})
+            tracking.log_evaluation(test_true, test_pred, "test")
+            print(f"test macro_f1={test_metrics['macro_f1']:.4f}")
+
+        # Save to disk first: log_model reads the artifact directory back off
+        # disk to package it, so the ordering is a real dependency, not a style.
+        save_artifact(model, tokenizer, config, metrics)
+        tracking.log_model(OUTPUT_DIR)
 
 
 def main() -> None:
@@ -287,6 +352,11 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=defaults.batch_size)
     parser.add_argument("--learning-rate", type=float, default=defaults.learning_rate)
     parser.add_argument("--seed", type=int, default=defaults.seed)
+    parser.add_argument(
+        "--eval-test",
+        action="store_true",
+        help="also score the held-out test split (use sparingly — see Config)",
+    )
     args = parser.parse_args()
 
     train(
@@ -295,6 +365,7 @@ def main() -> None:
             batch_size=args.batch_size,
             learning_rate=args.learning_rate,
             seed=args.seed,
+            eval_test=args.eval_test,
         )
     )
 
