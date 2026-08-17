@@ -29,11 +29,50 @@ from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 import tracking
-from data import ASPECTS, IGNORE_INDEX, LABEL_NAMES, Example, load_splits
+from data import ASPECTS, IGNORE_INDEX, LABEL_NAMES, Example, class_counts, load_splits
 from model import ENCODER_NAME, MAX_LENGTH, AspectSentimentModel, compute_loss
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO_ROOT / "ml" / "models" / "absa-distilbert"
+
+WEIGHT_SCHEMES = ("none", "sqrt-inverse", "inverse")
+
+
+def class_weight_tensor(
+    examples: list[Example],
+    scheme: str,
+    device: torch.device,
+) -> torch.Tensor | None:
+    """Build per-class loss weights from the training distribution.
+
+    ``inverse``       w_c = N / (C * n_c) — the textbook balanced weighting. It
+                      equalises each class's total contribution to the loss, but
+                      with a 22:1 imbalance it hands 'neutral' a weight of ~7.3,
+                      which can push the model into predicting rare classes
+                      constantly and destroying precision.
+    ``sqrt-inverse``  the square root of the above, renormalised to mean 1. A
+                      standard damped variant: it corrects in the same direction
+                      with roughly a quarter of the force.
+
+    Weights come from the TRAINING split only. Computing them over train+val
+    would leak the validation distribution into a training decision — a small
+    leak, but the kind that makes a validation score optimistic for no reason.
+    """
+    if scheme == "none":
+        return None
+    if scheme not in WEIGHT_SCHEMES:
+        raise ValueError(f"unknown scheme {scheme!r}; choose from {WEIGHT_SCHEMES}")
+
+    counts = np.array(class_counts(examples), dtype=np.float64)
+    if (counts == 0).any():
+        raise ValueError(f"a class is unrepresented in training: {counts.tolist()}")
+
+    weights = counts.sum() / (len(counts) * counts)
+    if scheme == "sqrt-inverse":
+        weights = np.sqrt(weights)
+        weights = weights / weights.mean()
+
+    return torch.tensor(weights, dtype=torch.float32, device=device)
 
 
 @dataclass
@@ -44,6 +83,10 @@ class Config:
     weight_decay: float = 0.01
     warmup_ratio: float = 0.1
     seed: int = 42
+    # One of WEIGHT_SCHEMES. Defaults to "none" so the baseline stays the
+    # baseline; changing a default silently would make every prior run
+    # incomparable to every future one.
+    class_weights: str = "none"
     # Off by default on purpose. The test split is the estimate of how the model
     # does on data it has never influenced; evaluating against it on every run
     # while tuning turns it into a second validation set, and the number stops
@@ -133,6 +176,11 @@ def evaluate(
         labels = batch["labels"].to(device)
 
         logits = model(input_ids, attention_mask)
+        # Deliberately UNWEIGHTED, even when training is weighted. Validation
+        # loss is used to compare runs against each other, and a loss computed
+        # under different weights is a different quantity — run A scoring lower
+        # than run B would tell you nothing. Macro-F1 is the selection metric;
+        # this stays a fixed yardstick.
         total_loss += compute_loss(logits, labels).item()
         batches += 1
 
@@ -195,7 +243,11 @@ def save_artifact(
     print(f"\nsaved to {OUTPUT_DIR}")
 
 
-def train(config: Config) -> None:
+def train(
+    config: Config,
+    run_name: str | None = None,
+    register: bool = False,
+) -> None:
     set_seed(config.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device: {device}")
@@ -220,6 +272,12 @@ def train(config: Config) -> None:
     )
 
     model = AspectSentimentModel().to(device)
+    weights = class_weight_tensor(train_examples, config.class_weights, device)
+    if weights is not None:
+        formatted = ", ".join(
+            f"{name}={value:.2f}" for name, value in zip(LABEL_NAMES, weights.tolist())
+        )
+        print(f"class weights ({config.class_weights}): {formatted}")
 
     # Weight decay is a regulariser that pulls weights toward zero. Applying it
     # to biases and LayerNorm scales hurts — those need the freedom to shift and
@@ -256,7 +314,7 @@ def train(config: Config) -> None:
     print(f"steps: {total_steps} ({len(train_loader)} per epoch)")
     print(f"tracking: {tracking.configure()}\n")
 
-    with mlflow.start_run() as run:
+    with mlflow.start_run(run_name=run_name) as run:
         # Params are the inputs to the run; tags are facts about the context it
         # ran in. MLflow lets you filter and sort on both, which is what makes
         # "show me every run with lr=3e-5 on the 4060" a query instead of a
@@ -293,7 +351,7 @@ def train(config: Config) -> None:
                     batch["input_ids"].to(device),
                     batch["attention_mask"].to(device),
                 )
-                loss = compute_loss(logits, batch["labels"].to(device))
+                loss = compute_loss(logits, batch["labels"].to(device), weights)
                 loss.backward()
 
                 # Fine-tuning occasionally produces a very large gradient that
@@ -342,7 +400,7 @@ def train(config: Config) -> None:
         # Save to disk first: log_model reads the artifact directory back off
         # disk to package it, so the ordering is a real dependency, not a style.
         save_artifact(model, tokenizer, config, metrics)
-        tracking.log_model(OUTPUT_DIR)
+        tracking.log_model(OUTPUT_DIR, register=register)
 
 
 def main() -> None:
@@ -357,6 +415,22 @@ def main() -> None:
         action="store_true",
         help="also score the held-out test split (use sparingly — see Config)",
     )
+    parser.add_argument(
+        "--class-weights",
+        choices=WEIGHT_SCHEMES,
+        default=defaults.class_weights,
+        help="per-class loss weighting to counteract the ~77%% 'absent' majority",
+    )
+    parser.add_argument(
+        "--run-name",
+        default=None,
+        help="label for this MLflow run (defaults to an MLflow-generated name)",
+    )
+    parser.add_argument(
+        "--register",
+        action="store_true",
+        help="promote this run's model to a new Model Registry version",
+    )
     args = parser.parse_args()
 
     train(
@@ -366,7 +440,10 @@ def main() -> None:
             learning_rate=args.learning_rate,
             seed=args.seed,
             eval_test=args.eval_test,
-        )
+            class_weights=args.class_weights,
+        ),
+        run_name=args.run_name,
+        register=args.register,
     )
 
 

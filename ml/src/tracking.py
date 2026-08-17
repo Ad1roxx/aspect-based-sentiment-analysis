@@ -250,8 +250,15 @@ def log_evaluation(
 # ---------------------------------------------------------------------------
 
 
-def log_model(model_dir: Path) -> str:
-    """Log the saved artifact as a registered model and return its version.
+def log_model(model_dir: Path, register: bool = False) -> str | None:
+    """Log the saved artifact to this run; optionally register it as a version.
+
+    Logging and registering are separate decisions on purpose. Every run should
+    keep its own model — that is what makes a run reproducible. But the Model
+    Registry is meant to be a curated shortlist of candidates, and auto-
+    registering every experiment turns it into a junk drawer where version 14
+    means nothing. Registration is therefore explicit: you register a model when
+    you have decided it is worth deploying.
 
     code_paths lists source files individually rather than the src directory.
     Passing a directory would nest imports one level deeper
@@ -272,8 +279,12 @@ def log_model(model_dir: Path) -> str:
             str(SRC_DIR / "model.py"),
             str(SRC_DIR / "data.py"),
         ],
-        registered_model_name=REGISTERED_MODEL_NAME,
+        registered_model_name=REGISTERED_MODEL_NAME if register else None,
     )
+
+    if not register:
+        print(f"logged model to run (not registered): {info.model_uri}")
+        return None
 
     version = str(info.registered_model_version)
     print(f"registered {REGISTERED_MODEL_NAME} version {version}")

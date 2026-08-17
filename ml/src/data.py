@@ -178,6 +178,27 @@ def train_val_split(
     return shuffled[n_val:], shuffled[:n_val]
 
 
+def class_counts(examples: list[Example]) -> list[int]:
+    """Count each label across every (sentence, aspect) pair in a split.
+
+    Counted globally rather than per aspect, because this feeds a single set of
+    class weights into one flattened cross-entropy call. Per-aspect weights would
+    be more precise — 'neutral' is far rarer for price than for misc — but would
+    require five separate loss computations. Noted as a limitation rather than
+    silently ignored.
+
+    IGNORE_INDEX positions are excluded: they contribute nothing to the loss, so
+    letting them skew the weights would be a bug.
+    """
+    counts = Counter(
+        label
+        for example in examples
+        for label in example.labels
+        if label != IGNORE_INDEX
+    )
+    return [counts.get(label, 0) for label in range(NUM_CLASSES)]
+
+
 def describe(name: str, examples: list[Example]) -> None:
     """Print the per-aspect label distribution for one split."""
     print(f"\n{name}  ({len(examples)} sentences)")

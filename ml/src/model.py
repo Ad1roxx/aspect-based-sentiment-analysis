@@ -77,7 +77,11 @@ class AspectSentimentModel(nn.Module):
         return logits.view(-1, self.num_aspects, self.num_classes)
 
 
-def compute_loss(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+def compute_loss(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    class_weights: torch.Tensor | None = None,
+) -> torch.Tensor:
     """Mean cross-entropy over every (sentence, aspect) pair.
 
     Flattening (batch, aspect, class) to (batch * aspect, class) treats each
@@ -87,10 +91,18 @@ def compute_loss(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
     ``ignore_index`` drops the positions labelled IGNORE_INDEX — the "conflict"
     annotations — from both the loss and its gradient, so those aspects
     contribute nothing rather than contributing something wrong.
+
+    ``class_weights`` multiplies each class's contribution to the loss. With
+    'absent' at 77% of labels and 'neutral' at 3%, the unweighted gradient is
+    dominated by a class the model finds easy, and predicting 'neutral' is never
+    worth the risk. Upweighting rare classes makes missing them expensive.
+    Whether that actually improves macro-F1 is an empirical question, not an
+    assumption — see explanations/sprint-03.md.
     """
     return F.cross_entropy(
         logits.reshape(-1, logits.size(-1)),
         labels.reshape(-1),
+        weight=class_weights,
         ignore_index=IGNORE_INDEX,
     )
 
