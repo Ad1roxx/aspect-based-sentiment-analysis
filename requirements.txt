@@ -25,12 +25,24 @@ transformers==5.14.1
 # --- Data handling ---------------------------------------------------------
 # XML parsing uses the standard library (xml.etree.ElementTree) — no dep needed.
 numpy==2.4.6
-pandas==3.0.5
+# Downgraded from 3.0.5 when mlflow was added in Sprint 2: mlflow requires
+# pandas<3. Recorded here rather than silently left stale — the pin has to match
+# the venv it was resolved in or it is not a pin.
+pandas==2.3.3
 
 # --- Metrics ---------------------------------------------------------------
-# Used from Sprint 1 for the stratified train/val split; carries the P/R/F1 and
-# confusion matrix work in Sprint 3.
+# f1_score / precision_recall_fscore_support / confusion_matrix. The train/val
+# split is seeded-random rather than stratified — see the note in ml/src/data.py.
 scikit-learn==1.9.0
+
+# --- Experiment tracking (Sprint 2) ----------------------------------------
+# Backend store is sqlite (ml/mlflow.db), not the classic ./mlruns file store.
+# As of MLflow 3.x the file store is in maintenance mode and raises on use
+# unless MLFLOW_ALLOW_FILE_STORE=true; it also never supported the Model
+# Registry, which is what gives artifacts real version numbers. Verified, not
+# assumed — see explanations/sprint-02.md.
+mlflow==3.15.1
+matplotlib==3.11.1    # confusion-matrix figures logged as run artifacts
 
 # --- Utilities -------------------------------------------------------------
 requests==2.34.2      # dataset download script

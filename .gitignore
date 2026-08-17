@@ -45,6 +45,11 @@ ml/mlruns/
 mlruns/
 mlartifacts/
 
+# MLflow sqlite backend store (runs, params, metrics, registered model
+# versions). Same reasoning: it is a local experiment log, not source.
+ml/mlflow.db
+*.db-journal
+
 # Trained model weights (~250MB per DistilBERT checkpoint). The artifact of
 # record lives in the MLflow run, not in Git. Git LFS would be the option if we
 # ever needed to version weights directly.
