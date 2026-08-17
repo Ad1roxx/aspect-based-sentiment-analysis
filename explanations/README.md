@@ -13,3 +13,4 @@ choice is recorded while it is still fresh rather than reconstructed afterwards.
 |---|---|---|
 | 01 | Data + model | [sprint-01.md](sprint-01.md) |
 | 02 | MLflow experiment tracking | [sprint-02.md](sprint-02.md) |
+| 03 | Evaluation + explainability | [sprint-03.md](sprint-03.md) |
