@@ -17,8 +17,10 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import subprocess
 import time
 from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 import mlflow
@@ -215,11 +217,42 @@ def evaluate(
     return metrics, true_by_aspect, pred_by_aspect
 
 
+def git_commit() -> str | None:
+    """The commit the artifact was trained from, or None outside a repo.
+
+    Params record the hyperparameters; the commit records the code. Two runs with
+    identical params can still differ if the loss function changed between them,
+    and this is the only field that catches that.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
+def stamp_registry_version(model_dir: Path, version: str) -> None:
+    """Record the assigned registry version into the written metadata.json."""
+    path = model_dir / "metadata.json"
+    metadata = json.loads(path.read_text())
+    metadata["registry_version"] = version
+    path.write_text(json.dumps(metadata, indent=2))
+
+
 def save_artifact(
     model: AspectSentimentModel,
     tokenizer: AutoTokenizer,
     config: Config,
     metrics: dict[str, float],
+    run_id: str,
 ) -> None:
     """Write weights, tokenizer and metadata to ml/models/.
 
@@ -238,6 +271,14 @@ def save_artifact(
         "max_length": MAX_LENGTH,
         "hyperparameters": vars(config),
         "validation_metrics": {k: round(v, 4) for k, v in metrics.items()},
+        # Provenance. The API serves this directory, not the MLflow registry, so
+        # the artifact must be able to say what it is on its own — otherwise
+        # "which model is in production?" is unanswerable from the running
+        # service. registry_version stays None unless the run was promoted.
+        "run_id": run_id,
+        "git_commit": git_commit(),
+        "trained_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "registry_version": None,
     }
     (OUTPUT_DIR / "metadata.json").write_text(json.dumps(metadata, indent=2))
     print(f"\nsaved to {OUTPUT_DIR}")
@@ -399,8 +440,13 @@ def train(
 
         # Save to disk first: log_model reads the artifact directory back off
         # disk to package it, so the ordering is a real dependency, not a style.
-        save_artifact(model, tokenizer, config, metrics)
-        tracking.log_model(OUTPUT_DIR, register=register)
+        save_artifact(model, tokenizer, config, metrics, run.info.run_id)
+        version = tracking.log_model(OUTPUT_DIR, register=register)
+
+        # Stamped after registration: the version number does not exist until
+        # the registry assigns it.
+        if version is not None:
+            stamp_registry_version(OUTPUT_DIR, version)
 
 
 def main() -> None:

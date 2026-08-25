@@ -44,6 +44,15 @@ scikit-learn==1.9.0
 mlflow==3.15.1
 matplotlib==3.11.1    # confusion-matrix figures logged as run artifacts
 
+# --- API serving (Sprint 4) -------------------------------------------------
+# These arrive transitively via mlflow, but are pinned explicitly because the
+# API depends on them directly. An undeclared dependency that happens to be
+# installed is a dependency that breaks the day the package pulling it in is
+# removed — and mlflow is exactly the package the serving container will drop.
+fastapi==0.141.1
+uvicorn==0.52.3
+pydantic==2.13.4
+
 # --- Utilities -------------------------------------------------------------
 requests==2.34.2      # dataset download script
 tqdm==4.70.0          # training progress bars
