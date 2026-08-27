@@ -33,7 +33,25 @@ python ml/src/train.py --class-weights sqrt-inverse --eval-test --register
 
 ## 2. API endpoints
 
-Use /docs and click "Try it out", or the curl commands below.
+**Do not type curl.** FastAPI generates an interactive console at
+http://127.0.0.1:8000/docs with a Try it out button for every endpoint, POST included.
+
+  1. open /docs
+  2. click the endpoint to expand it
+  3. click "Try it out"
+  4. edit the request body if there is one
+  5. click "Execute"
+
+It shows the status code, the response body, the response headers, and the curl
+equivalent if you ever do need one.
+
+The two GET endpoints are also just links you can click straight in the browser:
+
+  http://127.0.0.1:8000/health
+  http://127.0.0.1:8000/model-info
+
+Only section 2.7 (CORS) genuinely needs a command line, because a preflight is
+something the browser sends, not something you can type into a page.
 
 ### 2.1 GET /health
 
@@ -56,7 +74,11 @@ field is null, the artifact predates provenance stamping - retrain it.
 
 ### 2.3 POST /predict - happy path
 
-Send: {"text":"The pasta was incredible but the waiter ignored us for twenty minutes."}
+In /docs, POST /predict, Try it out, and use this body:
+
+```
+{"text": "The pasta was incredible but the waiter ignored us for twenty minutes."}
+```
 
 - [ ] Returns 200
 - [ ] ALL FIVE aspects are present, including the absent ones. The response shape must
@@ -69,7 +91,11 @@ Send: {"text":"The pasta was incredible but the waiter ignored us for twenty min
 
 ### 2.4 POST /predict - with explanations
 
-Send: {"text":"Cosy little place, though it is a bit overpriced for what you get.","explain":true}
+Same endpoint, with explain turned on:
+
+```
+{"text": "Cosy little place, though it is a bit overpriced for what you get.", "explain": true}
+```
 
 - [ ] price is negative at roughly 70%
 - [ ] price.words is populated, and "overpriced" has importance 1.000
@@ -106,7 +132,11 @@ Send a review longer than 128 tokens (roughly 100+ words):
 
 ### 2.7 CORS (the React app depends on this)
 
-Send an OPTIONS preflight to /predict with Origin: http://localhost:5173
+This one needs a terminal - a preflight is sent by the browser, not typed into a page:
+
+```
+curl -i -X OPTIONS http://127.0.0.1:8000/predict -H "Origin: http://localhost:5173" -H "Access-Control-Request-Method: POST"
+```
 
 - [ ] Returns 200 with header: access-control-allow-origin: http://localhost:5173
 - [ ] The same request with Origin: http://evil.example.com returns NO
