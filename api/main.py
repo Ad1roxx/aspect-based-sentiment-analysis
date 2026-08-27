@@ -127,7 +127,7 @@ def predict(request: PredictRequest) -> PredictResponse:
         # after stripping so whitespace-only input is a clean 422 rather than a
         # confident prediction about nothing.
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="text must contain non-whitespace characters",
         )
 
