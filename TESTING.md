@@ -1,8 +1,11 @@
 # Manual test checklist
 
-Hand-run checks for the ABSA system. Automated tests arrive in Sprint 5 (pytest);
-until then this is the record of what "working" means. It stays useful afterwards as
-the list of things a test suite cannot judge - whether the UI actually reads right.
+Hand-run checks for the ABSA system.
+
+The automated suite (Sprint 5) covers sections 2, 3 and 5 - run it with `pytest`.
+102 tests; `pytest -m "not integration"` runs the 80 that need no trained model.
+What remains genuinely manual is section 4: whether the UI actually reads right is
+not something a test suite can judge.
 
 Work top to bottom. Anything that fails and is not listed in section 6 is a real bug.
 
