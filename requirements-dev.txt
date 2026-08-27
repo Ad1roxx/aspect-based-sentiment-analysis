@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# Development and test dependencies.
+#
+#     pip install -r requirements.txt -r requirements-dev.txt
+#
+# Kept separate from requirements.txt so the serving container does not ship a
+# test runner. That is not tidiness: every package in a production image is
+# attack surface and something to keep patched, and pytest is neither needed nor
+# wanted at runtime. The Docker sprint installs only requirements.txt.
+# ---------------------------------------------------------------------------
+
+pytest==9.1.1
+pytest-cov==7.1.0
+
+# Required by fastapi.testclient / starlette's TestClient, which drives the API
+# tests in-process without binding a port.
+httpx==0.28.1

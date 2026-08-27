@@ -1,0 +1,32 @@
+# Project configuration. Only pytest and coverage live here for now — the
+# project is not packaged and installed, it is run from the repo.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# ml/src uses flat imports (`from data import ...`) rather than being a package.
+# pytest's pythonpath option puts it on sys.path for the test session, which
+# avoids sprinkling sys.path.insert calls through conftest. The repo root is
+# included so `from api.main import app` resolves.
+pythonpath = ["ml/src", "."]
+
+# --strict-markers turns a typo'd marker into an error instead of silently
+# running the test unmarked, which is how "we have integration tests" quietly
+# becomes false.
+addopts = "-q --strict-markers"
+
+markers = [
+    "integration: needs the trained artifact in ml/models/ (skipped when absent)",
+]
+
+[tool.coverage.run]
+source = ["ml/src", "api"]
+omit = ["*/__init__.py"]
+
+[tool.coverage.report]
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
