@@ -269,9 +269,31 @@ them as surprises.
    ambiance and price. Test supports are 3, 8 and 1 examples - there is nothing there
    to learn from. This is a data problem, not a bug. See explanations/sprint-03.md.
 
-2. service is often missed. "The pasta was incredible but the waiter ignored us"
-   returns only food. On "our waiter was incredibly rude" it has returned
-   service positive at 40%. Wrong, but with appropriately low confidence.
+2. Aspects get LOST IN MULTI-ASPECT SENTENCES. This is the big one, and it is not
+   specific to service.
+
+   The model reads single-aspect sentences well and degrades sharply when a second,
+   contrasting aspect is present:
+
+     "The waiter ignored us."                            service negative 0.73  correct
+     "The pasta was incredible but the waiter ignored us." service absent  0.46  WRONG
+
+   Measured on the test split - of aspects that genuinely ARE discussed, how often
+   the model avoids calling them absent:
+
+     single-aspect sentences   91.8%  (546/595)
+     multi-aspect sentences    78.8%  (298/378)
+
+   A 13-point drop. Two causes, both structural:
+
+   (a) Data. 77.9% of training sentences mention exactly ONE aspect; only 17.3%
+       mention two or more. The model has barely seen contrast.
+   (b) Architecture. One shared [CLS] vector feeds all five aspect heads, so a
+       strong signal for one aspect crowds out a weaker competing one. This is the
+       same root cause that made attention useless for explainability (sprint-03).
+
+   The low confidence is the tell: a lost aspect typically sits near 0.46-0.52,
+   far below the 0.93-0.96 of a genuinely absent one. Worth surfacing in the UI.
 
 3. Punctuation can rank first in explanations. The final full stop often takes top
    importance, because tokens next to [SEP] accumulate attribution. It is not filtered
