@@ -31,6 +31,8 @@ from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 import tracking
+from mams import MODES as EXTRA_DATA_MODES
+from mams import load_mams
 from data import (
     ABSENT,
     ASPECTS,
@@ -108,6 +110,10 @@ class Config:
     pooling: str = DEFAULT_POOLING
     # Applies only to the attention queries; ignored for 'cls' pooling.
     query_learning_rate: float = 1e-3
+    # Supplementary MAMS-ACSA data: 'none', 'filtered' or 'full'. See ml/src/mams.py.
+    # Only ever added to TRAIN — validation and test stay pure SemEval-2014, or the
+    # numbers would no longer be comparable with every earlier run.
+    extra_data: str = "none"
     # Off by default on purpose. The test split is the estimate of how the model
     # does on data it has never influenced; evaluating against it on every run
     # while tuning turns it into a second validation set, and the number stops
@@ -346,6 +352,13 @@ def train(
     print(f"device: {device}")
 
     train_examples, val_examples, test_examples = load_splits()
+
+    if config.extra_data != "none":
+        extra = load_mams(config.extra_data, verbose=True)
+        # Appended to TRAIN only. Validation and test remain pure SemEval-2014 so
+        # every number stays comparable with the runs from sprints 1-6.
+        train_examples = train_examples + extra
+
     print(f"train: {len(train_examples)}  val: {len(val_examples)}")
 
     tokenizer = AutoTokenizer.from_pretrained(ENCODER_NAME)
@@ -560,6 +573,12 @@ def main() -> None:
         help="how a sentence becomes the vector each aspect head reads",
     )
     parser.add_argument(
+        "--extra-data",
+        choices=EXTRA_DATA_MODES,
+        default=defaults.extra_data,
+        help="add MAMS-ACSA multi-aspect sentences to training",
+    )
+    parser.add_argument(
         "--register",
         action="store_true",
         help="promote this run's model to a new Model Registry version",
@@ -575,6 +594,7 @@ def main() -> None:
             eval_test=args.eval_test,
             class_weights=args.class_weights,
             pooling=args.pooling,
+            extra_data=args.extra_data,
         ),
         run_name=args.run_name,
         register=args.register,

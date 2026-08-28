@@ -73,6 +73,53 @@ SOURCES: tuple[Source, ...] = (
             "useless as a test set. The two files carry identical sentence ids."
         ),
     ),
+    # --- MAMS-ACSA (Jiang et al., EMNLP-IJCNLP 2019) -------------------------
+    # Supplementary training data for the multi-aspect failure measured in
+    # sprint 6. Every sentence has at least two aspects with DIFFERENT
+    # polarities, which is exactly the pattern SemEval-2014 barely contains
+    # (448 multi-aspect sentences out of 2585).
+    #
+    # Apache-2.0. Built from the same CSNY / Citysearch corpus as SemEval, so
+    # it overlaps ours: 67 sentences, 11 of them in our test split. The loader
+    # removes them — see ml/src/mams.py.
+    Source(
+        filename="mams_acsa_train.xml",
+        url=(
+            "https://raw.githubusercontent.com/siat-nlp/MAMS-for-ABSA/"
+            "cddcdb0f423b3fdb2c76b70744737abed3a00d17/"
+            "data/MAMS-ACSA/raw/train.xml"
+        ),
+        sha256="24c6a1a9f769ec5a9a1fc9a63077001339cec65317e3e72cf053d8055ec5f1ac",
+        size_bytes=1_081_235,
+        note="3149 sentences, all multi-aspect with differing polarities.",
+    ),
+    Source(
+        filename="mams_acsa_val.xml",
+        url=(
+            "https://raw.githubusercontent.com/siat-nlp/MAMS-for-ABSA/"
+            "cddcdb0f423b3fdb2c76b70744737abed3a00d17/"
+            "data/MAMS-ACSA/raw/val.xml"
+        ),
+        sha256="d4536b0ced8e77f53f88ff1835fcf561e0de02e41a509982f76eb9b8a375b2ed",
+        size_bytes=135_397,
+        note="400 sentences.",
+    ),
+    Source(
+        filename="mams_acsa_test.xml",
+        url=(
+            "https://raw.githubusercontent.com/siat-nlp/MAMS-for-ABSA/"
+            "cddcdb0f423b3fdb2c76b70744737abed3a00d17/"
+            "data/MAMS-ACSA/raw/test.xml"
+        ),
+        sha256="cc0dc3c5b711653daa9ac886c6517d3ebf8752954b73715692d7765fec4a57f5",
+        size_bytes=136_615,
+        note=(
+            "400 sentences. NOTE: this is MAMS's own test split, used here as "
+            "extra TRAINING data. Our evaluation is always the SemEval-2014 "
+            "gold test set, so MAMS's split boundaries carry no meaning for us "
+            "— but the overlap check still has to run against all three files."
+        ),
+    ),
 )
 
 
