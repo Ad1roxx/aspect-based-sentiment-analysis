@@ -301,45 +301,39 @@ them as surprises.
    A residual gap remains. 77.9% of SemEval-2014 training sentences discuss one
    aspect; MAMS-ACSA supplies the contrastive cases. See explanations/sprint-07.md.
 
-3. The word "place" makes the model OVER-DETECT the ambience aspect.
+3. The word "place" biased the ambience aspect. Largely corrected, not gone.
 
-   Measured on the test split, not inferred from one example:
+   MAMS assigns all 863 of its "place" annotations to a single category. Reviewed
+   against the sentence text they resolve to several, and 46% carry no aspect
+   signal at all - either duplicating an aspect already on the sentence, or firing
+   on "bar"/"place" where they are not places ("bar none", "a bar of chocolate",
+   "raise the bar", restaurant names). Only 20% were correct in both category and
+   polarity. Corrections are in data/mams_place_relabelled.json.
 
-     group                gold-absent   wrongly flagged    rate
-     contains "place"          49              9          18.4%
-     no "place"               633             20           3.2%
+   Before and after, on the sentence that exposed it:
 
-   Roughly 6x the false-positive rate. Cause: MAMS's "place" category maps onto
-   our "ambience" and is 60% neutral / 21% negative, against our ambience's
-   6% / 68% positive, at 2.2x the volume of MAMS's genuine "ambience".
+     "Cosy little place, though it is a bit overpriced."
+        before:  ambience negative 0.645   confidently WRONG
+        after:   ambience absent   0.869
 
-   IMPORTANT - this is NOT a polarity problem. When a "place" sentence really
-   does discuss ambience, the model is slightly BETTER than average:
+   Handled correctly either way:
+     "The room was cosy and warm."          -> ambience positive 0.887
+     "Lovely warm atmosphere..."            -> ambience positive 0.967
+     "I have to say the place was awesome." -> ambience positive 0.599
 
-     polarity correct, ambience discussed, with "place"    77.3%  (n=22)
-     polarity correct, ambience discussed, without         69.9%  (n=83)
+   Residual: "Cosy little place." alone still comes out absent 0.362 with
+   negative at 0.318, where positive would be right. The confident wrong answer
+   is gone; the uncertainty is not.
 
-   These are all handled correctly:
-     "it is a cozy place to go with a couple of friends."  -> positive
-     "This little place is wonderfully warm welcoming."    -> positive
-     "The place is absolutely adorable..."                 -> positive
+   Two earlier attempts at this made things WORSE and are kept as
+   tested-and-rejected options behind --extra-data:
 
-   What to expect in the UI: an occasional spurious ambience card on a review
-   that says "place" without commenting on the atmosphere. Some of those are
-   genuinely debatable rather than wrong - "I have to say the place was awesome"
-   is flagged as ambience, and it is not obvious that is an error.
-
-   One constructed sentence does still get the polarity wrong:
-     "Cosy little place, though it is a bit overpriced." -> ambience negative
-
-   Three fixes were built for this and ALL THREE made ambience worse overall:
-
-     arm         ambience F1   ambience-positive F1   multi recall
-     full            0.561          0.780                0.816
-     curated         0.553          0.718                0.793
-     remapped        0.479          0.648                0.773
-
-   Shipping "full" is the measured call. See explanations/sprint-07.md section 8.
+     arm           macro-F1   multi rec    gap   ambience F1
+     none            0.6048      0.767    0.125     0.541
+     full            0.6247      0.816    0.071     0.561
+     curated         0.6248      0.793    0.087     0.553   masks place
+     remapped        0.5975      0.773    0.101     0.479   place -> misc
+     relabelled      0.6299      0.823    0.064     0.572   shipped
 
 4. Punctuation can rank first in explanations. The final full stop often takes top
    importance, because tokens next to [SEP] accumulate attribution. It is not filtered
