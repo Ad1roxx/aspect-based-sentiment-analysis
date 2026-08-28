@@ -294,17 +294,29 @@ them as surprises.
    A residual gap remains. 77.9% of SemEval-2014 training sentences discuss one
    aspect; MAMS-ACSA supplies the contrastive cases. See explanations/sprint-07.md.
 
-3. NEW: ambience polarity regressed on some sentences. Adding MAMS improved
-   detection but its "place" category maps onto our "ambience", and MAMS uses
-   "place" for both the room and the venue generally (60% of those annotations
-   are neutral). Result:
+3. The word "place" is a blind spot for the ambience aspect.
 
-     "Cosy little place, though it is a bit overpriced for what you get."
-       ambience negative 64.5%   <- wrong, "cosy" is positive
-       price    negative 83.5%   <- correct
+     "Cosy little place."          -> ambience negative 0.518   WRONG
+     "Cosy little restaurant."     -> ambience absent   0.874
+     "The room was cosy and warm." -> ambience positive 0.856   correct
 
-   Better detection, worse polarity. Dropping or re-routing the place mapping is
-   the obvious next experiment.
+   Cause: MAMS's "place" category maps onto our "ambience" but is 60% neutral /
+   21% negative, against our ambience's 6% neutral / 68% positive, and it carries
+   2.2x the volume of MAMS's genuine "ambience" annotations. The model picked up
+   the literal token.
+
+   THREE FIXES WERE BUILT AND ALL THREE LOST. Masking "place" (--extra-data
+   curated) and re-routing it to misc (--extra-data remapped) both made ambience
+   measurably WORSE:
+
+     arm         ambience F1   ambience-positive F1   multi recall
+     full            0.561          0.780                0.816
+     curated         0.553          0.718                0.793
+     remapped        0.479          0.648                0.773
+
+   So the "place" data helps ambience overall despite the mismatch, and removing
+   it costs more than the blind spot does. Shipping "full" is the measured call,
+   not the lazy one. See explanations/sprint-07.md.
 
 4. Punctuation can rank first in explanations. The final full stop often takes top
    importance, because tokens next to [SEP] accumulate attribution. It is not filtered

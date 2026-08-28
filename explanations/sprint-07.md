@@ -251,3 +251,70 @@ python scripts/download_data.py
 python ml/src/mams.py
 python ml/src/train.py --extra-data full --pooling attention --class-weights sqrt-inverse
 ```
+
+---
+
+## 8. Postscript: three fixes for the `place` bug, all of which lost
+
+The ambience regression in §3 looked like a clean, well-understood bug. It was diagnosed correctly
+and then "fixed" three times, and every fix made things worse. This is the most useful thing in the
+sprint.
+
+### The diagnosis was right
+
+The cause is the literal token, not a vague distribution effect:
+
+```
+"Cosy little place."          -> ambience negative 0.518   WRONG
+"Cosy little restaurant."     -> ambience absent   0.874
+"The room was cosy and warm." -> ambience positive 0.856   correct
+"Lovely warm atmosphere..."   -> ambience positive 0.973   correct
+```
+
+Swapping one word flips the prediction. And the distributional cause is unambiguous:
+
+| category | n | neg | neu | pos |
+|---|---|---|---|---|
+| MAMS `ambience` | 392 | 31% | 14% | 55% |
+| MAMS `place` | 863 | 21% | **60%** | 19% |
+| SemEval `ambience` | 324 | 26% | 6% | **68%** |
+
+`place` carries 2.2× the volume of genuine `ambience` with a different distribution. Everything about
+that reasoning holds up.
+
+### Two fixes, built and measured
+
+- **`curated`** — mask `place` with `IGNORE_INDEX`. Keeps 2,879 multi-aspect sentences.
+- **`remapped`** — send `place` to `misc`, whose distribution (18/33/49) fits it far better than
+  ambience's. Keeps 3,329, and unlike masking it retains the aspect-detection signal.
+
+Both are principled. Both lose:
+
+| arm | macro-F1 | multi recall | gap | **ambience F1** | **ambience-positive F1** |
+|---|---|---|---|---|---|
+| `none` | 0.6048 | 0.767 | 0.125 | 0.541 | 0.721 |
+| **`full`** | 0.6247 | **0.816** | **0.071** | **0.561** | **0.780** |
+| `curated` | 0.6248 | 0.793 | 0.087 | 0.553 | 0.718 |
+| `remapped` | 0.5975 | 0.773 | 0.101 | 0.479 | 0.648 |
+
+**`full` has the best ambience F1 and the best ambience-positive F1** — the exact class the failing
+sentence needs. Removing the "contaminating" data made the model worse at the thing the contamination
+was supposedly damaging.
+
+### Why
+
+The `place` annotations are noisy for polarity but still carry real signal about *when ambience is
+being discussed*. Deleting 863 annotations to remove a token-level artefact costs more than the
+artefact does. The model ends up better at ambience overall while retaining one specific blind spot
+on the word "place".
+
+### The lesson
+
+A single wrong prediction is an anecdote. The instinct it produces — "I can see exactly what's wrong,
+let me fix it" — is strong, and here it was wrong three times running, each time with a correct
+diagnosis behind it. Understanding a mechanism is not the same as knowing that removing it helps.
+
+The failing sentence is still wrong. That is the honest outcome: a known, characterised limitation is
+better than a fix that improves one example and degrades the aggregate. `curated` and `remapped`
+remain in the codebase as tested-and-rejected options rather than being deleted, because "we tried
+this and measured it losing" is worth more than a clean-looking loader.
