@@ -16,3 +16,4 @@ choice is recorded while it is still fresh rather than reconstructed afterwards.
 | 03 | Evaluation + explainability | [sprint-03.md](sprint-03.md) |
 | 04 | FastAPI serving layer | [sprint-04.md](sprint-04.md) |
 | 05 | Tests | [sprint-05.md](sprint-05.md) |
+| 06 | Per-aspect attention pooling | [sprint-06.md](sprint-06.md) |
