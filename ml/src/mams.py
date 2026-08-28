@@ -96,8 +96,56 @@ def normalise(text: str) -> str:
     re-typed or re-punctuated across two corpora, and a conservative comparison
     would miss those and let them through into training.
     """
-    text = re.sub(r"[^a-z0-9 ]+", " ", text.lower())
+    text = text.lower()
+    # Apostrophes are DELETED, other punctuation becomes a space. The difference
+    # matters: replacing an apostrophe with a space turns "it's" into "it s",
+    # which then never matches a corpus that wrote "its" — while "good.Bad" must
+    # still split into two words rather than fusing.
+    text = text.replace("'", "").replace("’", "")
+    text = re.sub(r"[^a-z0-9 ]+", " ", text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def to_labels(
+    annotations: list[tuple[str, str]],
+    mode: str,
+) -> tuple[tuple[int, ...], Counter]:
+    """Map one sentence's MAMS annotations onto this project's label vector.
+
+    Pure, so it can be unit-tested with synthetic input — the data files are
+    gitignored and absent in CI, and this is where the subtle decisions live.
+
+    Returns the label tuple plus a Counter of what had to be masked and why.
+    """
+    labels = [ABSENT] * len(ASPECTS)
+    stats: Counter = Counter()
+
+    for category, polarity in annotations:
+        mapped = CATEGORY_MAP.get(category)
+        if mapped is None:
+            raise ValueError(f"unmapped MAMS category {category!r}")
+
+        if polarity == "neutral" and mode == "filtered":
+            # Masked, not dropped. The sentence keeps its other aspects, and this
+            # position contributes nothing to the loss — the same mechanism used
+            # for SemEval 'conflict'.
+            label = IGNORE_INDEX
+            stats["masked_neutral"] += 1
+        else:
+            label = POLARITY_TO_LABEL[polarity]
+
+        # Two MAMS categories can collapse onto one of ours (staff+service,
+        # place+ambience). If they disagree, the aspect is genuinely conflicted at
+        # our granularity, so mask it rather than letting whichever came last
+        # silently win — which would make the label depend on XML ordering.
+        slot = ASPECT_INDEX[mapped]
+        if labels[slot] not in (ABSENT, label):
+            labels[slot] = IGNORE_INDEX
+            stats["masked_merge_conflict"] += 1
+        else:
+            labels[slot] = label
+
+    return tuple(labels), stats
 
 
 def _parse(path: Path) -> list[tuple[str, list[tuple[str, str]]]]:
@@ -143,31 +191,8 @@ def load_mams(mode: str = "filtered", verbose: bool = False) -> list[Example]:
                 stats["dropped_overlap"] += 1
                 continue
 
-            labels = [ABSENT] * len(ASPECTS)
-            for category, polarity in annotations:
-                mapped = CATEGORY_MAP.get(category)
-                if mapped is None:
-                    raise ValueError(f"unmapped MAMS category {category!r}")
-
-                if polarity == "neutral" and mode == "filtered":
-                    # Masked, not dropped. The sentence keeps its other aspects,
-                    # and this position simply contributes nothing to the loss —
-                    # the same mechanism used for SemEval 'conflict'.
-                    label = IGNORE_INDEX
-                    stats["masked_neutral"] += 1
-                else:
-                    label = POLARITY_TO_LABEL[polarity]
-
-                # Two MAMS categories can map onto one of ours (staff+service,
-                # place+ambience). If they disagree, the aspect is genuinely
-                # conflicted at our granularity, so mask it rather than letting
-                # whichever came last silently win.
-                slot = ASPECT_INDEX[mapped]
-                if labels[slot] not in (ABSENT, label):
-                    labels[slot] = IGNORE_INDEX
-                    stats["masked_merge_conflict"] += 1
-                else:
-                    labels[slot] = label
+            labels, counts = to_labels(annotations, mode)
+            stats.update(counts)
 
             examples.append(
                 Example(
