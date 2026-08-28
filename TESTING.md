@@ -20,7 +20,7 @@ cd e:\absa-project
 uvicorn api.main:app --reload --port 8000
 
 # terminal 2 - MLflow UI (optional, for checking runs)
-mlflow ui --backend-store-uri sqlite:///ml/mlflow.db
+mlflow ui --backend-store-uri sqlite:///ml/mlflow.db --workers 1
 ```
 
 - [ ] API starts with no traceback
@@ -28,6 +28,27 @@ mlflow ui --backend-store-uri sqlite:///ml/mlflow.db
 - [ ] Startup takes a few seconds - that is the 265 MB checkpoint loading, and it
       should happen ONCE at boot, not on the first request
 - [ ] http://127.0.0.1:8000/docs renders the interactive Swagger page
+- [ ] http://127.0.0.1:8000/ redirects to /docs rather than showing "Not Found"
+
+Expected noise in the uvicorn terminal, not errors:
+
+  DistilBertModel LOAD REPORT ... vocab_transform / vocab_projector UNEXPECTED
+
+  The published distilbert-base-uncased checkpoint carries a masked-language-model
+  head. We load AutoModel, the bare encoder, which has no such head, so those five
+  tensors are unused. transformers says so itself: "can be ignored when loading
+  from different task/architecture".
+
+Expected noise from MLflow, also not errors:
+
+  - "MLflow job execution requirements not met ... does not support Windows" -
+    an async job feature we do not use.
+  - StarletteDeprecationWarning about starlette.middleware.wsgi - inside MLflow's
+    own code, repeated once per worker process.
+  - OSError [WinError 10022] with "Child process died" - MLflow starts several
+    uvicorn workers that share one socket, and Windows does not inherit sockets
+    across processes the way Linux does. The server recovers, but --workers 1
+    avoids it entirely. That is why the command above passes it.
 
 If the model is missing you will get "FileNotFoundError ... Train first". Fix with:
 python ml/src/train.py --class-weights sqrt-inverse --eval-test --register

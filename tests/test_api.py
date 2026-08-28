@@ -230,3 +230,21 @@ class TestOpenAPI:
     def test_docs_page_serves(self, client):
         """The interactive console TESTING.md tells you to use instead of curl."""
         assert client.get("/docs").status_code == 200
+
+
+class TestRootRedirect:
+    def test_root_redirects_to_docs(self, client):
+        """The URL uvicorn prints is the one people click first. Landing on a 404
+        there makes a working server look broken."""
+        response = client.get("/", follow_redirects=False)
+        assert response.status_code == 307
+        assert response.headers["location"] == "/docs"
+
+    def test_root_reaches_the_docs_page(self, client):
+        response = client.get("/")
+        assert response.status_code == 200
+
+    def test_root_is_not_in_the_api_contract(self, client):
+        """A human convenience, deliberately kept out of the schema the frontend
+        generates against."""
+        assert "/" not in client.get("/openapi.json").json()["paths"]

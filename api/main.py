@@ -17,6 +17,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from api.schemas import (
     HealthResponse,
@@ -73,6 +74,21 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    """Send the bare host to the interactive docs.
+
+    Without this, clicking the URL uvicorn prints in the terminal lands on
+    {"detail":"Not Found"} — correct, since no resource exists at /, but it reads
+    like a broken server. The useful thing to serve at the root of an API with no
+    root resource is the console that lists the resources it does have.
+
+    Excluded from the OpenAPI schema: it is a convenience for humans, not part of
+    the contract the frontend codes against.
+    """
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/health", response_model=HealthResponse, tags=["ops"])
