@@ -16,7 +16,7 @@ from fastapi.testclient import TestClient
 
 FAKE_METADATA = {
     "encoder": "distilbert-base-uncased",
-    "aspects": ["food", "service", "ambiance", "price", "misc"],
+    "aspects": ["food", "service", "ambience", "price", "misc"],
     "labels": ["absent", "negative", "neutral", "positive"],
     "max_length": 128,
     "registry_version": "4",
@@ -27,7 +27,7 @@ FAKE_METADATA = {
     "validation_metrics": {"macro_f1": 0.598},
 }
 
-ASPECT_ORDER = ("food", "service", "ambiance", "price", "misc")
+ASPECT_ORDER = ("food", "service", "ambience", "price", "misc")
 
 
 def fake_predict(text: str, explain: bool = False):

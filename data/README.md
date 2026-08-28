@@ -54,7 +54,7 @@ Polarities:
 Two things the loader has to reconcile with the project spec:
 
 1. **Naming.** Upstream uses `ambience` and `anecdotes/miscellaneous`; this project uses
-   `ambiance` and `misc`. The loader maps them explicitly.
+   `ambience` and `misc`. The loader maps them explicitly.
 2. **`conflict` is a fourth polarity** (~5% of annotations) that the project's three-class scheme
    has no room for. Handled in `ml/src/data.py`.
 

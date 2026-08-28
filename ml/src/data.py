@@ -6,7 +6,7 @@ category. For a given sentence each aspect is exactly one of:
     absent / negative / neutral / positive
 
 "absent" is the key design choice. Most sentences mention only one or two of the
-five categories — 2465 of the 3041 training sentences mention exactly one — so a
+five categories — 2014 of the 2585 training sentences mention exactly one — so a
 plain 3-class sentiment scheme has nowhere to put "this review never talks about
 price". Making absence its own class lets one forward pass answer both "is this
 aspect discussed?" and "how does the writer feel about it?".
@@ -31,14 +31,18 @@ TEST_XML = RAW_DIR / "Restaurants_Test_Gold.xml"
 # The five aspect categories this project predicts, in a fixed order. Every
 # label vector follows this order, so it must not be reshuffled once a model is
 # trained — index 0 means "food" in the data, the model and the API alike.
-ASPECTS: tuple[str, ...] = ("food", "service", "ambiance", "price", "misc")
+ASPECTS: tuple[str, ...] = ("food", "service", "ambience", "price", "misc")
 ASPECT_INDEX: dict[str, int] = {name: i for i, name in enumerate(ASPECTS)}
 
-# Upstream spells two categories differently from this project. Mapping them
-# explicitly (rather than quietly renaming during parsing) keeps the translation
-# auditable.
+# One upstream category is renamed. "anecdotes/miscellaneous" is unusable as an
+# API field name and as a UI label, so it becomes "misc". Mapping it explicitly
+# — rather than quietly rewriting during parsing — keeps the translation auditable.
+#
+# The other four categories are used exactly as SemEval spells them, including
+# "ambience". An earlier version aliased that to "ambiance"; the alias was removed
+# because renaming a dataset field for no reason is a thing you then have to
+# explain forever.
 CATEGORY_ALIASES: dict[str, str] = {
-    "ambience": "ambiance",
     "anecdotes/miscellaneous": "misc",
 }
 

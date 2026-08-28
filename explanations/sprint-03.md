@@ -69,7 +69,7 @@ The headline number hides the real story. Per-class validation F1:
 |---|---|---|
 | food | 0.000 → 0.000 | 0.581 → 0.707 |
 | service | 0.000 → 0.000 | 0.603 → 0.716 |
-| ambiance | 0.000 → 0.000 | 0.421 → **0.357** ↓ |
+| ambience | 0.000 → 0.000 | 0.421 → **0.357** ↓ |
 | price | 0.000 → 0.000 | 0.457 → 0.679 |
 | misc | 0.541 → 0.528 | 0.061 → **0.567** |
 
@@ -81,7 +81,7 @@ there is nothing for a loss weight to amplify — you cannot reweight your way t
 have. Fixing it needs more neutral data, or a coarser label space that stops pretending to
 distinguish neutral from absent at that sample size.
 
-Note also the honest regression: **`ambiance/negative` got worse**, 0.421 → 0.357. Rebalancing is
+Note also the honest regression: **`ambience/negative` got worse**, 0.421 → 0.357. Rebalancing is
 not free, and reporting only the aspects that improved would be dishonest.
 
 ### Two design details worth defending
@@ -165,11 +165,11 @@ They moved to `evaluation.py`, which imports no MLflow at all. The seam is now:
 | service | 0.6521 |
 | food | 0.6477 |
 | price | 0.6107 |
-| ambiance | 0.5482 |
+| ambience | 0.5482 |
 | **overall** | **0.6287** |
 
 `food/neutral` reached 0.111 on test (support 31) — still poor, but no longer exactly zero.
-`service`, `ambiance` and `price` remain at 0.000 with supports of 3, 8 and 1.
+`service`, `ambience` and `price` remain at 0.000 with supports of 3, 8 and 1.
 
 ---
 
@@ -271,7 +271,7 @@ three runs recorded in MLflow with per-class metrics. Then the sharper point —
 weighting scored *below* baseline (0.5233 vs 0.5395)**, so the direction was right but the magnitude
 mattered more than the idea. Then the honest decomposition: the gain came entirely from `negative`
 and `positive`; `neutral` did not move, because it is a data problem, not a loss problem. And name
-the regression — `ambiance/negative` fell 0.421 → 0.357 — before they find it.
+the regression — `ambience/negative` fell 0.421 → 0.357 — before they find it.
 
 **② "Why gradient × input rather than attention?"**
 
@@ -284,7 +284,7 @@ answer, and be able to say why — a real baseline instead of the zero vector.
 
 **③ "Your macro-F1 is 0.63. What's still broken, and what would you do next?"**
 
-The trap is claiming it is fine. `neutral` is still 0.000 on service, ambiance and price, with test
+The trap is claiming it is fine. `neutral` is still 0.000 on service, ambience and price, with test
 supports of 3, 8 and 1. That is not a model failure so much as a labelling scheme that pretends to
 make a distinction the data cannot support. Concrete options, in order of honesty: merge
 `neutral` into `absent` for the sparse aspects and say so explicitly; collect or augment neutral

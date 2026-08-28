@@ -23,13 +23,13 @@ class TestParsing:
 
     def test_multi_aspect_sentence(self, sample_xml):
         example = parse_semeval_xml(sample_xml)[0]
-        # (food, service, ambiance, price, misc)
+        # (food, service, ambience, price, misc)
         assert example.labels == (POSITIVE, NEGATIVE, ABSENT, ABSENT, ABSENT)
         assert example.mentioned_aspects() == ["food", "service"]
 
     def test_unmentioned_aspects_default_to_absent(self, sample_xml):
         example = parse_semeval_xml(sample_xml)[0]
-        assert example.labels[ASPECTS.index("ambiance")] == ABSENT
+        assert example.labels[ASPECTS.index("ambience")] == ABSENT
 
     def test_label_vector_length_matches_aspects(self, sample_xml):
         assert all(len(e.labels) == len(ASPECTS) for e in parse_semeval_xml(sample_xml))
@@ -38,9 +38,9 @@ class TestParsing:
 class TestCategoryAliases:
     """Upstream spells two categories differently from this project."""
 
-    def test_ambience_maps_to_ambiance(self, sample_xml):
+    def test_ambience_maps_to_ambience(self, sample_xml):
         example = parse_semeval_xml(sample_xml)[1]
-        assert example.labels[ASPECTS.index("ambiance")] == POSITIVE
+        assert example.labels[ASPECTS.index("ambience")] == POSITIVE
 
     def test_anecdotes_maps_to_misc(self, sample_xml):
         example = parse_semeval_xml(sample_xml)[2]

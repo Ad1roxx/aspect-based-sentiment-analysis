@@ -54,7 +54,7 @@ names phase B explicitly, because that is the mistake it is designed to catch.
 ### Two mismatches the loader reconciles
 
 1. **Naming.** Upstream spells the categories `ambience` and `anecdotes/miscellaneous`; this project
-   uses `ambiance` and `misc`. Mapped explicitly in `CATEGORY_ALIASES` so the translation is
+   uses `ambience` and `misc`. Mapped explicitly in `CATEGORY_ALIASES` so the translation is
    auditable rather than buried in parsing logic.
 2. **A fourth polarity.** Alongside positive/negative/neutral there is `conflict` — the sentence is
    both positive and negative about one aspect. About 5% of annotations. Handled below.
@@ -119,7 +119,7 @@ four aspects are still genuinely absent, and that is valid signal.
          reshape (batch, 5, 4)
                     │
     ┌──────┬────────┼────────┬──────┐
-   food  service ambiance  price  misc     each a 4-way softmax
+   food  service ambience  price  misc     each a 4-way softmax
 ```
 
 ### Why one shared encoder
@@ -219,14 +219,14 @@ Per-class F1 on the held-out test set, with support in brackets:
 |---|---|---|---|---|---|
 | food | 0.915 (382) | 0.476 (69) | **0.000** (31) | 0.851 (302) | 0.561 |
 | service | 0.979 (628) | 0.696 (63) | **0.000** (3) | 0.874 (101) | 0.637 |
-| ambiance | 0.970 (682) | 0.240 (21) | **0.000** (8) | 0.776 (76) | 0.496 |
+| ambience | 0.970 (682) | 0.240 (21) | **0.000** (8) | 0.776 (76) | 0.496 |
 | price | 0.979 (717) | 0.294 (28) | **0.000** (1) | 0.660 (51) | 0.483 |
 | misc | 0.935 (566) | 0.044 (41) | 0.619 (51) | 0.687 (127) | 0.571 |
 
 **The model never once correctly predicts `neutral`** for four of the five aspects. Not rarely —
 zero times.
 
-The cause is visible in the training data: `service` has 17 neutral training examples, `ambiance`
+The cause is visible in the training data: `service` has 17 neutral training examples, `ambience`
 19, `price` 9. There is nothing there to learn from. `misc` is the exception at 0.619, and it is
 also the only aspect with substantial neutral training data (313 examples) — because
 `anecdotes/miscellaneous` collects factual, non-evaluative statements like *"I live a block away"*.

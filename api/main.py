@@ -60,7 +60,7 @@ app = FastAPI(
     title="Aspect-Based Sentiment Analysis",
     description=(
         "Predicts sentiment for five restaurant-review aspects "
-        "(food, service, ambiance, price, misc), with optional per-word "
+        "(food, service, ambience, price, misc), with optional per-word "
         "attribution."
     ),
     version="1.0.0",

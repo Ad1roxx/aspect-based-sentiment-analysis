@@ -112,7 +112,7 @@ def unknown_category_xml(tmp_path: Path) -> Path:
 def examples() -> list[Example]:
     """A small labelled set with a deliberately skewed class distribution.
 
-    Label order is (food, service, ambiance, price, misc) — the ASPECTS order, which
+    Label order is (food, service, ambience, price, misc) — the ASPECTS order, which
     is load-bearing everywhere.
     """
     return [

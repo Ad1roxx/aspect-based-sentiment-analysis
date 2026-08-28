@@ -90,7 +90,7 @@ something the browser sends, not something you can type into a page.
 - [ ] registry_version is "4" (not null)
 - [ ] run_id, git_commit and trained_at are all populated
 - [ ] git_commit matches a real commit - check with: git log --oneline
-- [ ] aspects is exactly ["food","service","ambiance","price","misc"] IN THAT ORDER
+- [ ] aspects is exactly ["food","service","ambience","price","misc"] IN THAT ORDER
 - [ ] hyperparameters.class_weights is "sqrt-inverse"
 
 This endpoint is the answer to "which model is in production?". If any provenance
@@ -177,7 +177,7 @@ These test the model, not the code. Confidence numbers shift if you retrain.
 | "The pasta was incredible." | food positive |
 | "Service was slow and the waiter was rude." | service negative |
 | "It is way too expensive for what you get." | price negative |
-| "Lovely warm atmosphere, great for a date." | ambiance positive |
+| "Lovely warm atmosphere, great for a date." | ambience positive |
 | "I walked past it on my way to work." | everything absent |
 
 - [ ] At least 4 of the 5 behave as expected
@@ -199,7 +199,7 @@ The React page does not exist yet. This is the list to work through when it land
 ### 4.1 Layout and content
 
 - [ ] A text area for the review and a clear submit control
-- [ ] FIVE aspect cards: food, service, ambiance, price, misc
+- [ ] FIVE aspect cards: food, service, ambience, price, misc
 - [ ] Each card shows the aspect name, the sentiment, and a confidence percentage
 - [ ] Sentiment is distinguishable WITHOUT relying on colour alone (icon, or the word
       itself). Red/green alone fails for colour-blind users
@@ -266,7 +266,7 @@ Real limitations, measured and documented. Listed here so testing does not redis
 them as surprises.
 
 1. neutral is broken for four of five aspects. F1 is exactly 0.000 for service,
-   ambiance and price. Test supports are 3, 8 and 1 examples - there is nothing there
+   ambience and price. Test supports are 3, 8 and 1 examples - there is nothing there
    to learn from. This is a data problem, not a bug. See explanations/sprint-03.md.
 
 2. Aspects get LOST IN MULTI-ASPECT SENTENCES. This is the big one, and it is not
@@ -305,7 +305,7 @@ them as surprises.
 5. Confidence is not calibrated. It is a softmax preference among four options, not a
    probability of being correct. Neural classifiers are typically overconfident.
 
-6. ambiance/negative regressed with class weighting (0.421 to 0.357). A known cost of
+6. ambience/negative regressed with class weighting (0.421 to 0.357). A known cost of
    rebalancing, reported rather than hidden.
 
 7. CPU inference is about 200 ms per request. Fine for one review at a time; this is

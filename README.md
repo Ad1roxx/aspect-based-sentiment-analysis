@@ -1,7 +1,7 @@
 # Aspect-Based Sentiment Analysis — Restaurant Reviews
 
 Predicts sentiment (positive / negative / neutral) for a fixed set of aspect categories
-— **food, service, ambiance, price, misc** — in restaurant reviews, served through a
+— **food, service, ambience, price, misc** — in restaurant reviews, served through a
 FastAPI backend and a React frontend.
 
 Trained on [SemEval-2014 Task 4](https://alt.qcri.org/semeval2014/task4/) restaurant data.

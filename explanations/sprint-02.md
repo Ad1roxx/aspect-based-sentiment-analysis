@@ -180,7 +180,7 @@ something much more specific:
 ```
 food      neutral   prec 0.000  recall 0.000  f1 0.000   support 10
 service   neutral   prec 0.000  recall 0.000  f1 0.000   support  3
-ambiance  neutral   prec 0.000  recall 0.000  f1 0.000   support  4
+ambience  neutral   prec 0.000  recall 0.000  f1 0.000   support  4
 price     neutral   prec 0.000  recall 0.000  f1 0.000   support  1
 misc      neutral   prec 0.561  recall 0.523  f1 0.541   support 44
 ```
@@ -188,7 +188,7 @@ misc      neutral   prec 0.561  recall 0.523  f1 0.541   support 44
 **Finding 1 — the neutral collapse is mostly a data problem.** Neutral works exactly where neutral
 data exists. With 44 validation examples `misc` reaches 0.541; with 1–10 examples the other four
 reach zero. The confusion matrices confirm it structurally: the `neutral` *column* is entirely empty
-for food, service, ambiance and price. The model never predicts neutral for those aspects — not
+for food, service, ambience and price. The model never predicts neutral for those aspects — not
 rarely, never. You cannot fix that with a learning rate.
 
 **Finding 2 — `misc/negative` is a threshold problem, not a knowledge problem.**
