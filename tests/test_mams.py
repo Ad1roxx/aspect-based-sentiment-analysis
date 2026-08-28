@@ -9,7 +9,15 @@ from __future__ import annotations
 import pytest
 
 from data import ABSENT, ASPECTS, IGNORE_INDEX, NEGATIVE, NEUTRAL, POSITIVE
-from mams import CATEGORY_MAP, MODES, load_mams, normalise, to_labels
+from mams import (
+    CATEGORY_MAP,
+    MODES,
+    REMAP_TARGETS,
+    UNRELIABLE_CATEGORIES,
+    load_mams,
+    normalise,
+    to_labels,
+)
 
 FOOD, SERVICE, AMBIENCE, PRICE, MISC = (ASPECTS.index(a) for a in ASPECTS)
 
@@ -124,4 +132,39 @@ class TestModes:
             load_mams("everything")
 
     def test_declared_modes(self):
-        assert MODES == ("none", "filtered", "full")
+        assert MODES == ("none", "filtered", "full", "curated", "remapped")
+
+
+class TestPlaceHandling:
+    """MAMS 'place' is 60% neutral against our ambience's 6%, and the model
+    learned the literal token — 'Cosy little place.' predicted ambience negative
+    while 'Cosy little restaurant.' predicted absent. Two responses, both here."""
+
+    def test_full_mode_sends_place_to_ambience(self):
+        labels, _ = to_labels([("place", "neutral")], "full")
+        assert labels[AMBIENCE] == NEUTRAL
+
+    def test_curated_mode_masks_place(self):
+        labels, stats = to_labels([("place", "neutral")], "curated")
+        assert labels[AMBIENCE] == IGNORE_INDEX
+        assert stats["masked_unreliable"] == 1
+
+    def test_remapped_mode_sends_place_to_misc(self):
+        """Keeps the detection signal instead of discarding it — MAMS place
+        (21/60/19) fits our misc (18/33/49) far better than our ambience."""
+        labels, stats = to_labels([("place", "neutral")], "remapped")
+        assert labels[MISC] == NEUTRAL
+        assert labels[AMBIENCE] == ABSENT
+        assert stats["remapped"] == 1
+
+    def test_genuine_ambience_is_untouched_in_every_mode(self):
+        """Only 'place' is reclassified. MAMS's own 'ambience' category is
+        distribution-compatible with ours and must keep flowing through."""
+        for mode in ("full", "curated", "remapped"):
+            labels, _ = to_labels([("ambience", "positive")], mode)
+            assert labels[AMBIENCE] == POSITIVE, mode
+
+    def test_the_two_policies_are_declared_consistently(self):
+        assert UNRELIABLE_CATEGORIES <= set(CATEGORY_MAP)
+        assert set(REMAP_TARGETS) <= set(CATEGORY_MAP)
+        assert set(REMAP_TARGETS.values()) <= set(ASPECTS)
