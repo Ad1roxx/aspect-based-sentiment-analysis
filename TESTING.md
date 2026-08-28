@@ -291,32 +291,55 @@ them as surprises.
      "The pasta was incredible but the waiter ignored us."
        food positive 98.5%, service negative 95.3%   (was: service absent 46.3%)
 
+   But service is IMPROVED, not solved. Measured over the whole test split, of
+   sentences that genuinely discuss service:
+
+     single-aspect    96.2%   (75/78)
+     multi-aspect     91.0%   (81/89)
+     overall          93.4%   (156/167)  -> 11 service mentions still missed
+
    A residual gap remains. 77.9% of SemEval-2014 training sentences discuss one
    aspect; MAMS-ACSA supplies the contrastive cases. See explanations/sprint-07.md.
 
-3. The word "place" is a blind spot for the ambience aspect.
+3. The word "place" makes the model OVER-DETECT the ambience aspect.
 
-     "Cosy little place."          -> ambience negative 0.518   WRONG
-     "Cosy little restaurant."     -> ambience absent   0.874
-     "The room was cosy and warm." -> ambience positive 0.856   correct
+   Measured on the test split, not inferred from one example:
 
-   Cause: MAMS's "place" category maps onto our "ambience" but is 60% neutral /
-   21% negative, against our ambience's 6% neutral / 68% positive, and it carries
-   2.2x the volume of MAMS's genuine "ambience" annotations. The model picked up
-   the literal token.
+     group                gold-absent   wrongly flagged    rate
+     contains "place"          49              9          18.4%
+     no "place"               633             20           3.2%
 
-   THREE FIXES WERE BUILT AND ALL THREE LOST. Masking "place" (--extra-data
-   curated) and re-routing it to misc (--extra-data remapped) both made ambience
-   measurably WORSE:
+   Roughly 6x the false-positive rate. Cause: MAMS's "place" category maps onto
+   our "ambience" and is 60% neutral / 21% negative, against our ambience's
+   6% / 68% positive, at 2.2x the volume of MAMS's genuine "ambience".
+
+   IMPORTANT - this is NOT a polarity problem. When a "place" sentence really
+   does discuss ambience, the model is slightly BETTER than average:
+
+     polarity correct, ambience discussed, with "place"    77.3%  (n=22)
+     polarity correct, ambience discussed, without         69.9%  (n=83)
+
+   These are all handled correctly:
+     "it is a cozy place to go with a couple of friends."  -> positive
+     "This little place is wonderfully warm welcoming."    -> positive
+     "The place is absolutely adorable..."                 -> positive
+
+   What to expect in the UI: an occasional spurious ambience card on a review
+   that says "place" without commenting on the atmosphere. Some of those are
+   genuinely debatable rather than wrong - "I have to say the place was awesome"
+   is flagged as ambience, and it is not obvious that is an error.
+
+   One constructed sentence does still get the polarity wrong:
+     "Cosy little place, though it is a bit overpriced." -> ambience negative
+
+   Three fixes were built for this and ALL THREE made ambience worse overall:
 
      arm         ambience F1   ambience-positive F1   multi recall
      full            0.561          0.780                0.816
      curated         0.553          0.718                0.793
      remapped        0.479          0.648                0.773
 
-   So the "place" data helps ambience overall despite the mismatch, and removing
-   it costs more than the blind spot does. Shipping "full" is the measured call,
-   not the lazy one. See explanations/sprint-07.md.
+   Shipping "full" is the measured call. See explanations/sprint-07.md section 8.
 
 4. Punctuation can rank first in explanations. The final full stop often takes top
    importance, because tokens next to [SEP] accumulate attribution. It is not filtered
