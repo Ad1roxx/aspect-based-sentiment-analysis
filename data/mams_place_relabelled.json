@@ -1,0 +1,3467 @@
+{
+ "_about": "Corrected annotations for MAMS-ACSA's 'place' category. MAMS assigns all 863 of these to a single category; reviewed against the sentence text, they resolve to several different aspects, and 46% carry no aspect signal of their own - either duplicating an aspect already annotated on the same sentence, or firing on the tokens 'bar'/'place' where they are not places at all ('bar none', 'a bar of chocolate', 'raise the bar', restaurant names, other venues).",
+ "_schema": "key '<mams split>:<sentence index>' -> {category, polarity}. category 'drop' means the annotation is discarded, and polarity is then null. Keys are stable because the MAMS files are pinned by commit and SHA-256 in scripts/download_data.py.",
+ "_distribution": {
+  "drop": 397,
+  "ambience": 360,
+  "service": 58,
+  "misc": 40,
+  "price": 8,
+  "agreement_with_mams_category": "360/863 = 42%",
+  "agreement_with_mams_category_and_polarity": "169/863 = 20%"
+ },
+ "corrections": {
+  "train:0": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:16": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:17": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:23": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:24": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:30": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:34": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:35": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:39": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:41": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:45": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:48": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:50": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:52": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:57": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:60": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:62": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:69": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:71": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:74": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:82": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:90": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:92": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:95": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:98": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:106": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:109": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:111": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:113": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:122": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:123": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:132": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:137": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:138": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:142": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:156": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:160": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:166": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:169": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:172": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:179": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:194": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:197": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:202": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:207": {
+   "category": "misc",
+   "polarity": "negative"
+  },
+  "train:208": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:219": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:222": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:223": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:228": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:231": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:234": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:236": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:239": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:243": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:249": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:252": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:255": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:256": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:260": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:265": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:275": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:276": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:287": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:288": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:295": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:299": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:302": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:322": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:325": {
+   "category": "misc",
+   "polarity": "negative"
+  },
+  "train:328": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:332": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:333": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:334": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:337": {
+   "category": "price",
+   "polarity": "negative"
+  },
+  "train:338": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:344": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:350": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:351": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:354": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:359": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:364": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:369": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:372": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:373": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:376": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:382": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:388": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:393": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:394": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:396": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:399": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:401": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:404": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:407": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:413": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:415": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:416": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:422": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:423": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:424": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:431": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:435": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:441": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:446": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:448": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:450": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:451": {
+   "category": "price",
+   "polarity": "neutral"
+  },
+  "train:453": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:454": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:456": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:461": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:462": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:467": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:469": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:472": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:474": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:475": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:478": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:481": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:482": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:486": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:489": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:491": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:494": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:501": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:503": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:507": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:513": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:516": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:524": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:527": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:528": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:538": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:546": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:552": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:554": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:556": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:566": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:570": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:571": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:574": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:579": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:590": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:595": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:600": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:610": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:613": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:618": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:624": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:625": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:631": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:640": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:645": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:654": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:657": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:667": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:671": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:673": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:674": {
+   "category": "price",
+   "polarity": "positive"
+  },
+  "train:675": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:678": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:684": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:688": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:691": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:694": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:697": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:700": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:712": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:718": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:721": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:728": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:733": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:738": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:740": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:742": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:743": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:753": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:762": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:768": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:769": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:789": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:797": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:801": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:814": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:815": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:817": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:820": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:822": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:827": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:836": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:837": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:838": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:839": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:846": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:849": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:851": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:855": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:864": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:879": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:884": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:886": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:908": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:909": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:910": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:913": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:915": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:925": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:927": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:930": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:933": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:934": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:935": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:945": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:953": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:956": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:980": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:981": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:984": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:990": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:997": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:998": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:999": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1001": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1006": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1010": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1012": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1013": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1014": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:1017": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1021": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1022": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1025": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1028": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1031": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1034": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1036": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1038": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1039": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1041": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1048": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1053": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1058": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1063": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1064": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1068": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1069": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1073": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1078": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1080": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1081": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1083": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1091": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1093": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1097": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1108": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1111": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1112": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1119": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1120": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1129": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1137": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1145": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1147": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1150": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1157": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1159": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1160": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1166": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1181": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1183": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1190": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1199": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1203": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1207": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1210": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1211": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1217": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1226": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1227": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1235": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1253": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1254": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:1256": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1263": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1265": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1272": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1273": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1275": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1285": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1293": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1294": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1298": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1299": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1309": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1314": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1322": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1325": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1326": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1327": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1330": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1338": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1342": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1343": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1352": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1362": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1368": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1373": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1377": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1378": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1380": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1391": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1404": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1408": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1411": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1413": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1418": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1427": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1431": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1432": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:1433": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1435": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1437": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1438": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1440": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1453": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1454": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1461": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1465": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1469": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1473": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:1478": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1479": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1481": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1485": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1492": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1494": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1496": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1499": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1501": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1506": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1509": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1517": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1520": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1525": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1538": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1539": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1540": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1543": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1544": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1553": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1555": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1562": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1571": {
+   "category": "price",
+   "polarity": "negative"
+  },
+  "train:1574": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1577": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1582": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1587": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1590": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1591": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1592": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1596": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1598": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1600": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1601": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1606": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1620": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1631": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1646": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1650": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1651": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1655": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1660": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1661": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1663": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1664": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1673": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1676": {
+   "category": "price",
+   "polarity": "negative"
+  },
+  "train:1679": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1681": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1692": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1702": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1705": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:1707": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:1722": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1724": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1727": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1728": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1733": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1735": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1747": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1749": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1753": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1767": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1769": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1783": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1792": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1793": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1799": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1806": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1807": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1812": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1813": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1814": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1815": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1824": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1826": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1832": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1833": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1837": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1841": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1854": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:1859": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1866": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1876": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1884": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1886": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1890": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1893": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1896": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1910": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1916": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1917": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1925": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1929": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1936": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1940": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1945": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:1954": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1955": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:1960": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1970": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:1988": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:1992": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2002": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2004": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2005": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2010": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2013": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2014": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2015": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2017": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2019": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2027": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2031": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2042": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2044": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2045": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2049": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2052": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2055": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2056": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2062": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2063": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2065": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2074": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2078": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2079": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2088": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2091": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2092": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2099": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2101": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2103": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2106": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2110": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2115": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2122": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2131": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2145": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:2146": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2149": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2156": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2164": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2172": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2179": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2182": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2185": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2188": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2190": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2199": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2201": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2203": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2215": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2218": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2219": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2226": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2227": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2229": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2230": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2232": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2235": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2236": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2244": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2248": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2250": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:2256": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2259": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2267": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2269": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2274": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2283": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2290": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2297": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2298": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2303": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2305": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2309": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2319": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2323": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2324": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2330": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2337": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2341": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2346": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2349": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2352": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2354": {
+   "category": "misc",
+   "polarity": "neutral"
+  },
+  "train:2361": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2363": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2374": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2376": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2384": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2385": {
+   "category": "service",
+   "polarity": "neutral"
+  },
+  "train:2392": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2394": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2399": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2404": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2407": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2409": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2415": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2420": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2422": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2423": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2429": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2431": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2432": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2434": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2437": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2441": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2442": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2448": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2449": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2469": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2472": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2474": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2480": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2482": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2483": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2484": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2485": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2487": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2493": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2495": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2505": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:2510": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2511": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2517": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2520": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2524": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2530": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2531": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2551": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2552": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2556": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2561": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2565": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2566": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2568": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2571": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "train:2574": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2578": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2581": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2585": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2588": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2593": {
+   "category": "price",
+   "polarity": "negative"
+  },
+  "train:2609": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2610": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2612": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2614": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2623": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2624": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2639": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2640": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2641": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2643": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2646": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2648": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2649": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2653": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2656": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2657": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2659": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2662": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2663": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2664": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2666": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2670": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2674": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2675": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2679": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2690": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2692": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2694": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2703": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2704": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2708": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2720": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2721": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2723": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2727": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2733": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2739": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2740": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2743": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2746": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2759": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2761": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2768": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2773": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2780": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2786": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2788": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2791": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2792": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "train:2795": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2805": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2806": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2808": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2813": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2815": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2817": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2823": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2828": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2829": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2839": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2845": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2851": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2857": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2858": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2859": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2862": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2864": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2872": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2881": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2888": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2894": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2898": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "train:2900": {
+   "category": "service",
+   "polarity": "neutral"
+  },
+  "train:2902": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2910": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2912": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2913": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2915": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2922": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2935": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2947": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2951": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:2952": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2953": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2966": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2979": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2985": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2987": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:2992": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:2996": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:2999": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:3003": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3004": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3008": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3011": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3013": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:3020": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3024": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3035": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:3039": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "train:3041": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3044": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:3065": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:3071": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3077": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3080": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3082": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:3086": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3088": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3095": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3099": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3110": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "train:3112": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3114": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "train:3117": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3118": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3130": {
+   "category": "drop",
+   "polarity": null
+  },
+  "train:3132": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:7": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:16": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:18": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:27": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:33": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:34": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "val:35": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:44": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:49": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:56": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "val:65": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "val:71": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:72": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:75": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:83": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:85": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:90": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "val:92": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:96": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:100": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:106": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:112": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:115": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:118": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:126": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:138": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:142": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:151": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:158": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:160": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:166": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:172": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:173": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:181": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:187": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "val:189": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:200": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "val:202": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:203": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:208": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:220": {
+   "category": "price",
+   "polarity": "negative"
+  },
+  "val:225": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:226": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:229": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:232": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:236": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "val:237": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "val:239": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:240": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:250": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:252": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:254": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:256": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:257": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:265": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:266": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:267": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:269": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:270": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:278": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:279": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:284": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:285": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:295": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:297": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:300": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:301": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:303": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "val:310": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:313": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:319": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:320": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:321": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "val:326": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:328": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:336": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:339": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:343": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "val:344": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:348": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:350": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:352": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:356": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:358": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "val:365": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:382": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "val:390": {
+   "category": "drop",
+   "polarity": null
+  },
+  "val:397": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "test:0": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "test:7": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:13": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "test:15": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:30": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:51": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:54": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:55": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:65": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:71": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:72": {
+   "category": "price",
+   "polarity": "negative"
+  },
+  "test:75": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:76": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:102": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:105": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:113": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:114": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:116": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:120": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:123": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:124": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:128": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:136": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:137": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:146": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:147": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:166": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "test:172": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:176": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:180": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:185": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:187": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:193": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:197": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "test:204": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:222": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:223": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:224": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:225": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:231": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "test:232": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:233": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:240": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:248": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:256": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:263": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:264": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:265": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:267": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:274": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:275": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:278": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:287": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:290": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:294": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:295": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "test:297": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "test:298": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "test:302": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:303": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:304": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:305": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:310": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:314": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:316": {
+   "category": "misc",
+   "polarity": "positive"
+  },
+  "test:321": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:327": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:331": {
+   "category": "service",
+   "polarity": "negative"
+  },
+  "test:333": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:335": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:336": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:354": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:359": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:368": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:369": {
+   "category": "service",
+   "polarity": "positive"
+  },
+  "test:381": {
+   "category": "ambience",
+   "polarity": "positive"
+  },
+  "test:382": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "test:384": {
+   "category": "ambience",
+   "polarity": "neutral"
+  },
+  "test:392": {
+   "category": "drop",
+   "polarity": null
+  },
+  "test:394": {
+   "category": "ambience",
+   "polarity": "negative"
+  },
+  "test:398": {
+   "category": "ambience",
+   "polarity": "positive"
+  }
+ }
+}

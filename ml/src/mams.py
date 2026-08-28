@@ -44,6 +44,7 @@ Hence two modes, so the difference can be measured rather than argued about:
 
 from __future__ import annotations
 
+import json
 import re
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -67,7 +68,7 @@ MAMS_FILES = (
     RAW_DIR / "mams_acsa_test.xml",
 )
 
-MODES = ("none", "filtered", "full", "curated", "remapped")
+MODES = ("none", "filtered", "full", "curated", "remapped", "relabelled")
 
 # Categories whose polarity is not trustworthy at OUR granularity, masked with
 # IGNORE_INDEX in 'curated' mode. They still mark the aspect as discussed via the
@@ -92,6 +93,12 @@ UNRELIABLE_CATEGORIES: frozenset[str] = frozenset({"place"})
 # (18 / 33 / 49) than to our ambience (26 / 6 / 68), and unlike masking it keeps
 # the aspect-detection signal rather than throwing it away.
 REMAP_TARGETS: dict[str, str] = {"place": "misc"}
+
+# 'relabelled' mode instead reads corrected annotations from disk. MAMS assigns
+# all 863 'place' annotations to one category; reviewed against the sentence
+# text they resolve to several, and 46% carry no aspect signal at all. Only 20%
+# were correct in both category and polarity. See data/mams_place_relabelled.json.
+RELABELLED_PATH = REPO_ROOT / "data" / "mams_place_relabelled.json"
 
 # MAMS uses eight categories; this project uses five. Two of the merges are
 # judgement calls and are flagged as such rather than presented as obvious:
@@ -136,6 +143,7 @@ def normalise(text: str) -> str:
 def to_labels(
     annotations: list[tuple[str, str]],
     mode: str,
+    correction: dict | None = None,
 ) -> tuple[tuple[int, ...], Counter]:
     """Map one sentence's MAMS annotations onto this project's label vector.
 
@@ -152,7 +160,16 @@ def to_labels(
         if mapped is None:
             raise ValueError(f"unmapped MAMS category {category!r}")
 
-        if mode == "remapped" and category in REMAP_TARGETS:
+        if mode == "relabelled" and category == "place":
+            if correction is None:
+                raise ValueError("relabelled mode requires a correction for 'place'")
+            if correction["category"] == "drop":
+                stats["dropped_annotation"] += 1
+                continue
+            mapped = correction["category"]
+            label = POLARITY_TO_LABEL[correction["polarity"]]
+            stats["relabelled"] += 1
+        elif mode == "remapped" and category in REMAP_TARGETS:
             mapped = REMAP_TARGETS[category]
             label = POLARITY_TO_LABEL[polarity]
             stats["remapped"] += 1
@@ -183,6 +200,19 @@ def to_labels(
             labels[slot] = label
 
     return tuple(labels), stats
+
+
+def load_corrections() -> dict[str, dict]:
+    """Read the corrected 'place' annotations keyed by '<split>:<sentence index>'.
+
+    Keys are positional, which is only safe because the MAMS files are pinned by
+    commit and SHA-256 in scripts/download_data.py — if those files were ever
+    swapped for a different revision, every correction would silently attach to
+    the wrong sentence. The checksum check is what makes this safe.
+    """
+    if not RELABELLED_PATH.is_file():
+        raise FileNotFoundError(f"{RELABELLED_PATH} not found")
+    return json.loads(RELABELLED_PATH.read_text(encoding="utf-8"))["corrections"]
 
 
 def _parse(path: Path) -> list[tuple[str, list[tuple[str, str]]]]:
@@ -218,6 +248,7 @@ def load_mams(mode: str = "filtered", verbose: bool = False) -> list[Example]:
 
     train, val, test = load_splits()
     ours = {normalise(example.text) for example in train + val + test}
+    corrections = load_corrections() if mode == "relabelled" else {}
 
     examples: list[Example] = []
     stats: Counter = Counter()
@@ -228,7 +259,8 @@ def load_mams(mode: str = "filtered", verbose: bool = False) -> list[Example]:
                 stats["dropped_overlap"] += 1
                 continue
 
-            labels, counts = to_labels(annotations, mode)
+            correction = corrections.get(f"{path.stem.replace('mams_acsa_', '')}:{index}")
+            labels, counts = to_labels(annotations, mode, correction)
             stats.update(counts)
 
             examples.append(

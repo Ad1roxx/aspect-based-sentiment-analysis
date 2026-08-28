@@ -132,7 +132,9 @@ class TestModes:
             load_mams("everything")
 
     def test_declared_modes(self):
-        assert MODES == ("none", "filtered", "full", "curated", "remapped")
+        assert MODES == (
+            "none", "filtered", "full", "curated", "remapped", "relabelled",
+        )
 
 
 class TestPlaceHandling:
@@ -168,3 +170,78 @@ class TestPlaceHandling:
         assert UNRELIABLE_CATEGORIES <= set(CATEGORY_MAP)
         assert set(REMAP_TARGETS) <= set(CATEGORY_MAP)
         assert set(REMAP_TARGETS.values()) <= set(ASPECTS)
+
+
+class TestRelabelled:
+    """MAMS assigns all 863 'place' annotations to one category. Reviewed against
+    the sentence text they resolve to several, and 46% carry no aspect signal at
+    all — only 20% were correct in both category and polarity."""
+
+    def test_relabelled_is_a_declared_mode(self):
+        assert "relabelled" in MODES
+
+    def test_correction_overrides_the_category(self):
+        labels, stats = to_labels(
+            [("place", "neutral")], "relabelled",
+            correction={"category": "service", "polarity": "negative"},
+        )
+        assert labels[SERVICE] == NEGATIVE
+        assert labels[AMBIENCE] == ABSENT
+        assert stats["relabelled"] == 1
+
+    def test_correction_overrides_the_polarity(self):
+        """MAMS polarity agreed only 47% of the time even where the category was
+        right, so corrections carry their own polarity."""
+        labels, _ = to_labels(
+            [("place", "neutral")], "relabelled",
+            correction={"category": "ambience", "polarity": "positive"},
+        )
+        assert labels[AMBIENCE] == POSITIVE
+
+    def test_drop_removes_the_annotation_entirely(self):
+        """A dropped annotation must leave the aspect ABSENT rather than masked:
+        it was never evidence about that aspect in the first place."""
+        labels, stats = to_labels(
+            [("place", "neutral")], "relabelled",
+            correction={"category": "drop", "polarity": None},
+        )
+        assert labels[AMBIENCE] == ABSENT
+        assert stats["dropped_annotation"] == 1
+
+    def test_dropping_place_keeps_the_other_aspects(self):
+        labels, _ = to_labels(
+            [("place", "neutral"), ("staff", "negative")], "relabelled",
+            correction={"category": "drop", "polarity": None},
+        )
+        assert labels[SERVICE] == NEGATIVE
+
+    def test_missing_correction_raises(self):
+        """Corrections are keyed positionally against files pinned by SHA-256.
+        A missing key means the data and the corrections have drifted apart, which
+        must fail loudly rather than silently fall back to the broken mapping."""
+        with pytest.raises(ValueError, match="requires a correction"):
+            to_labels([("place", "neutral")], "relabelled", correction=None)
+
+    def test_non_place_categories_are_untouched(self):
+        labels, stats = to_labels(
+            [("staff", "positive")], "relabelled",
+            correction={"category": "drop", "polarity": None},
+        )
+        assert labels[SERVICE] == POSITIVE
+        assert stats["relabelled"] == 0
+
+
+class TestCorrectionsFile:
+    def test_covers_every_place_annotation(self):
+        from mams import load_corrections
+        assert len(load_corrections()) == 863
+
+    def test_every_category_is_valid(self):
+        from mams import load_corrections
+        valid = set(ASPECTS) | {"drop"}
+        assert all(c["category"] in valid for c in load_corrections().values())
+
+    def test_polarity_is_null_exactly_when_dropped(self):
+        from mams import load_corrections
+        for c in load_corrections().values():
+            assert (c["polarity"] is None) == (c["category"] == "drop")
