@@ -48,7 +48,13 @@ def load_model(
     metadata = json.loads((model_dir / "metadata.json").read_text())
     tokenizer = AutoTokenizer.from_pretrained(model_dir)
 
-    model = AspectSentimentModel(encoder_name=metadata["encoder"])
+    # pooling defaults to "cls" for artifacts written before it was recorded.
+    # Guessing wrong here does not error — it silently loads a state dict into
+    # the wrong architecture — so the default matches what those artifacts were.
+    model = AspectSentimentModel(
+        encoder_name=metadata["encoder"],
+        pooling=metadata.get("pooling", "cls"),
+    )
     state = torch.load(model_dir / "model.pt", map_location=device, weights_only=True)
     model.load_state_dict(state)
     model.to(device).eval()

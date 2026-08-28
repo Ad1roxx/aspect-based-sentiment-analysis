@@ -145,14 +145,28 @@ class TestExplanations:
             food[word] != pytest.approx(service[word], abs=1e-4) for word in food
         ), "food and service produced identical attributions"
 
-    def test_occluding_the_top_word_changes_the_prediction(self, loaded):
+    def test_occluding_the_top_word_weakens_the_prediction(self, loaded):
         """Causal validation of the attribution ranking.
 
         Gradient x input is a first-order approximation, so its output needs
         checking against something causal. If masking the highest-attributed word
         does not change the prediction, the ranking is not finding what the model
         depends on.
+
+        Two details this test got wrong the first time, both worth keeping:
+
+        * The occlusion is CASE-INSENSITIVE. The tokenizer is uncased, so it
+          returns "cosy" for a sentence containing "Cosy". A plain str.replace
+          matched nothing, so the "occluded" text was identical to the original
+          and the test was comparing a sentence with itself — passing or failing
+          for reasons unrelated to attribution.
+        * The assertion is a CONFIDENCE DROP, not a label flip. A label flip
+          requires the masked word to be worth more than the model's entire
+          margin, which a well-trained model often survives. Demanding a flip
+          makes the test fail as the model gets better.
         """
+        import re
+
         from explain import explain
         from model import predict
 
@@ -162,11 +176,16 @@ class TestExplanations:
         result = explain(model, text, tokenizer, device, "price")
         top_word = max(result["words"], key=lambda pair: pair[1])[0]
 
-        occluded = text.replace(top_word, "[MASK]")
-        after = predict(model, [occluded], tokenizer, device)[0]["price"]
+        occluded = re.sub(re.escape(top_word), "[MASK]", text, flags=re.IGNORECASE)
+        assert occluded != text, f"occlusion of {top_word!r} did not alter the text"
 
-        assert after["label"] != result["label"], (
-            f"masking {top_word!r} left the prediction unchanged"
+        after = predict(model, [occluded], tokenizer, device)[0]["price"]
+        weakened = after["label"] != result["label"] or (
+            after["confidence"] < result["confidence"]
+        )
+        assert weakened, (
+            f"masking {top_word!r} left {result['label']} at "
+            f"{after['confidence']:.3f} vs {result['confidence']:.3f}"
         )
 
 

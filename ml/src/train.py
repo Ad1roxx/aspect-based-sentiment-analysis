@@ -31,8 +31,23 @@ from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 import tracking
-from data import ASPECTS, IGNORE_INDEX, LABEL_NAMES, Example, class_counts, load_splits
-from model import ENCODER_NAME, MAX_LENGTH, AspectSentimentModel, compute_loss
+from data import (
+    ABSENT,
+    ASPECTS,
+    IGNORE_INDEX,
+    LABEL_NAMES,
+    Example,
+    class_counts,
+    load_splits,
+)
+from model import (
+    DEFAULT_POOLING,
+    ENCODER_NAME,
+    MAX_LENGTH,
+    POOLING_MODES,
+    AspectSentimentModel,
+    compute_loss,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO_ROOT / "ml" / "models" / "absa-distilbert"
@@ -89,6 +104,10 @@ class Config:
     # baseline; changing a default silently would make every prior run
     # incomparable to every future one.
     class_weights: str = "none"
+    # 'cls' or 'attention' — see model.AspectSentimentModel.
+    pooling: str = DEFAULT_POOLING
+    # Applies only to the attention queries; ignored for 'cls' pooling.
+    query_learning_rate: float = 1e-3
     # Off by default on purpose. The test split is the estimate of how the model
     # does on data it has never influenced; evaluating against it on every run
     # while tuning turns it into a second validation set, and the number stops
@@ -171,6 +190,8 @@ def evaluate(
     batches = 0
     true_by_aspect: list[list[int]] = [[] for _ in ASPECTS]
     pred_by_aspect: list[list[int]] = [[] for _ in ASPECTS]
+    mention_hits = {"single": 0, "multi": 0}
+    mention_totals = {"single": 0, "multi": 0}
 
     for batch in loader:
         input_ids = batch["input_ids"].to(device)
@@ -188,6 +209,22 @@ def evaluate(
 
         predictions = logits.argmax(dim=-1).cpu()
         labels = labels.cpu()
+
+        # Mention-detection recall, split by how many aspects the sentence
+        # actually discusses. This is the metric the architecture change targets:
+        # of aspects genuinely discussed, how often does the model avoid calling
+        # them 'absent'? Macro-F1 averages this failure away, because a lost
+        # aspect looks like a correct 'absent' prediction for four other aspects.
+        real = (labels != ABSENT) & (labels != IGNORE_INDEX)
+        found = real & (predictions != ABSENT)
+        mentioned_per_row = real.sum(dim=1)
+        for row in range(labels.size(0)):
+            count = int(mentioned_per_row[row])
+            if count == 0:
+                continue
+            bucket = "single" if count == 1 else "multi"
+            mention_hits[bucket] += int(found[row].sum())
+            mention_totals[bucket] += count
 
         for aspect_index in range(len(ASPECTS)):
             aspect_labels = labels[:, aspect_index]
@@ -214,6 +251,18 @@ def evaluate(
         per_aspect.append(score)
 
     metrics["macro_f1"] = float(np.mean(per_aspect))
+
+    for bucket in ("single", "multi"):
+        total = mention_totals[bucket]
+        metrics[f"mention_recall_{bucket}"] = (
+            mention_hits[bucket] / total if total else 0.0
+        )
+    # The gap is the headline number for this experiment: how much worse the
+    # model gets when a sentence discusses more than one thing.
+    metrics["mention_recall_gap"] = (
+        metrics["mention_recall_single"] - metrics["mention_recall_multi"]
+    )
+
     return metrics, true_by_aspect, pred_by_aspect
 
 
@@ -269,6 +318,9 @@ def save_artifact(
         "aspects": list(ASPECTS),
         "labels": list(LABEL_NAMES),
         "max_length": MAX_LENGTH,
+        # Load-bearing: the artifact cannot be rebuilt without knowing which
+        # pooling produced it, because the two modes have different parameters.
+        "pooling": config.pooling,
         "hyperparameters": vars(config),
         "validation_metrics": {k: round(v, 4) for k, v in metrics.items()},
         # Provenance. The API serves this directory, not the MLflow registry, so
@@ -312,7 +364,7 @@ def train(
         collate_fn=collate,
     )
 
-    model = AspectSentimentModel().to(device)
+    model = AspectSentimentModel(pooling=config.pooling).to(device)
     weights = class_weight_tensor(train_examples, config.class_weights, device)
     if weights is not None:
         formatted = ", ".join(
@@ -325,24 +377,48 @@ def train(
     # rescale activations — so they are excluded. This split is standard for
     # transformer fine-tuning.
     no_decay = ("bias", "LayerNorm.weight")
+
+    # aspect_queries gets its own, much higher learning rate. The encoder is
+    # pretrained and only needs nudging, which is what 2e-5 is for; the aspect
+    # queries are randomly initialised and have to travel a long way in 324 steps.
+    # At 2e-5 they do not move at all — measured: their norm after four epochs was
+    # 0.55, identical to initialisation, and the attention stayed near-uniform.
+    # Separate rates for pretrained bodies and fresh heads is standard practice
+    # and is the difference between this mechanism working and being decoration.
+    fresh = ("aspect_queries",)
+
+    def is_fresh(name: str) -> bool:
+        return any(marker in name for marker in fresh)
+
     grouped_parameters = [
         {
             "params": [
                 p
                 for n, p in model.named_parameters()
-                if not any(marker in n for marker in no_decay)
+                if not is_fresh(n) and not any(m in n for m in no_decay)
             ],
             "weight_decay": config.weight_decay,
+            "lr": config.learning_rate,
         },
         {
             "params": [
                 p
                 for n, p in model.named_parameters()
-                if any(marker in n for marker in no_decay)
+                if not is_fresh(n) and any(m in n for m in no_decay)
             ],
             "weight_decay": 0.0,
+            "lr": config.learning_rate,
         },
     ]
+    fresh_params = [p for n, p in model.named_parameters() if is_fresh(n)]
+    if fresh_params:
+        grouped_parameters.append(
+            {
+                "params": fresh_params,
+                "weight_decay": 0.0,
+                "lr": config.query_learning_rate,
+            }
+        )
     optimizer = torch.optim.AdamW(grouped_parameters, lr=config.learning_rate)
 
     total_steps = len(train_loader) * config.epochs
@@ -419,6 +495,11 @@ def train(
                 f"macro_f1={metrics['macro_f1']:.4f}"
             )
             print(f"          {per_aspect}")
+            print(
+                f"          mention recall: single={metrics['mention_recall_single']:.3f}"
+                f"  multi={metrics['mention_recall_multi']:.3f}"
+                f"  gap={metrics['mention_recall_gap']:.3f}"
+            )
 
         elapsed = time.time() - started
         mlflow.log_metric("training_seconds", elapsed)
@@ -473,6 +554,12 @@ def main() -> None:
         help="label for this MLflow run (defaults to an MLflow-generated name)",
     )
     parser.add_argument(
+        "--pooling",
+        choices=POOLING_MODES,
+        default=defaults.pooling,
+        help="how a sentence becomes the vector each aspect head reads",
+    )
+    parser.add_argument(
         "--register",
         action="store_true",
         help="promote this run's model to a new Model Registry version",
@@ -487,6 +574,7 @@ def main() -> None:
             seed=args.seed,
             eval_test=args.eval_test,
             class_weights=args.class_weights,
+            pooling=args.pooling,
         ),
         run_name=args.run_name,
         register=args.register,

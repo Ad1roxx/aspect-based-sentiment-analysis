@@ -56,7 +56,10 @@ class ABSAModel(mlflow.pyfunc.PythonModel):
         self.metadata = json.loads((model_dir / "metadata.json").read_text())
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
 
-        self.model = AspectSentimentModel(encoder_name=self.metadata["encoder"])
+        self.model = AspectSentimentModel(
+            encoder_name=self.metadata["encoder"],
+            pooling=self.metadata.get("pooling", "cls"),
+        )
         self.model.load_state_dict(
             torch.load(model_dir / "model.pt", map_location="cpu", weights_only=True)
         )
