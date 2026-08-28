@@ -36,7 +36,10 @@ Hence two modes, so the difference can be measured rather than argued about:
               from — the model sees "here food is positive AND service is
               negative AND price is absent".
 ``full``      everything kept, neutral included. The naive merge, included so
-              the claim above is testable instead of asserted.
+              the claim above is testable instead of asserted. It won.
+``curated``   like ``full``, but categories in UNRELIABLE_CATEGORIES are masked.
+              Added after ``full`` introduced an ambience polarity regression
+              traced to MAMS's ``place`` category.
 """
 
 from __future__ import annotations
@@ -64,7 +67,31 @@ MAMS_FILES = (
     RAW_DIR / "mams_acsa_test.xml",
 )
 
-MODES = ("none", "filtered", "full")
+MODES = ("none", "filtered", "full", "curated", "remapped")
+
+# Categories whose polarity is not trustworthy at OUR granularity, masked with
+# IGNORE_INDEX in 'curated' mode. They still mark the aspect as discussed via the
+# sentence's other annotations; they just contribute no polarity signal.
+#
+# 'place' earned its place here by measurement, not suspicion:
+#
+#   MAMS ambience (n=392)   neg 31%  neu 14%  pos 55%    <- compatible with ours
+#   MAMS place    (n=863)   neg 21%  neu 60%  pos 19%    <- not
+#   SemEval ambience        neg 26%  neu  6%  pos 68%
+#
+# 'place' carries 2.2x the volume of genuine ambience with a completely different
+# distribution, and the effect is visible at the token level: after merging,
+# "Cosy little place." predicted ambience NEGATIVE 0.518, while the same sentence
+# with "restaurant" instead of "place" predicted absent, and "The room was cosy
+# and warm." predicted positive 0.856. The model had learned the literal word
+# "place" as evidence for non-positive ambience.
+UNRELIABLE_CATEGORIES: frozenset[str] = frozenset({"place"})
+
+# 'remapped' mode instead sends those categories somewhere their distribution
+# fits better. MAMS place (neg 21 / neu 60 / pos 19) sits far closer to our misc
+# (18 / 33 / 49) than to our ambience (26 / 6 / 68), and unlike masking it keeps
+# the aspect-detection signal rather than throwing it away.
+REMAP_TARGETS: dict[str, str] = {"place": "misc"}
 
 # MAMS uses eight categories; this project uses five. Two of the merges are
 # judgement calls and are flagged as such rather than presented as obvious:
@@ -125,7 +152,17 @@ def to_labels(
         if mapped is None:
             raise ValueError(f"unmapped MAMS category {category!r}")
 
-        if polarity == "neutral" and mode == "filtered":
+        if mode == "remapped" and category in REMAP_TARGETS:
+            mapped = REMAP_TARGETS[category]
+            label = POLARITY_TO_LABEL[polarity]
+            stats["remapped"] += 1
+        elif mode == "curated" and category in UNRELIABLE_CATEGORIES:
+            # Masked rather than dropped. Dropping would leave the aspect at
+            # ABSENT, teaching "ambience was not discussed" for a sentence that
+            # plainly discusses it — worse than saying nothing.
+            label = IGNORE_INDEX
+            stats["masked_unreliable"] += 1
+        elif polarity == "neutral" and mode == "filtered":
             # Masked, not dropped. The sentence keeps its other aspects, and this
             # position contributes nothing to the loss — the same mechanism used
             # for SemEval 'conflict'.
@@ -208,6 +245,7 @@ def load_mams(mode: str = "filtered", verbose: bool = False) -> list[Example]:
             f"MAMS ({mode}): kept {stats['kept']}, "
             f"dropped {stats['dropped_overlap']} overlapping ours, "
             f"masked {stats['masked_neutral']} neutral, "
+            f"{stats['masked_unreliable']} unreliable-category, "
             f"{stats['masked_merge_conflict']} merge conflicts"
         )
     return examples
