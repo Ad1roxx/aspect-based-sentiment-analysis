@@ -31,5 +31,8 @@ __pycache__/
 .pytest_cache/
 .coverage
 explanations/
-CLAUDE.md
-PROJECT_PLAN.md
+
+# Root-level markdown: docs and working notes. None of it is needed inside the
+# image, and excluding the directory-level glob avoids listing filenames here,
+# which would publish them in a file that ships with the repo.
+/*.md
