@@ -19,7 +19,12 @@ cd e:\absa-project
 .venv\Scripts\activate
 uvicorn api.main:app --reload --port 8000
 
-# terminal 2 - MLflow UI (optional, for checking runs)
+# terminal 2 - the React page
+cd frontend
+npm install          # first time only
+npm run dev          # http://127.0.0.1:5173
+
+# terminal 3 - MLflow UI (optional, for checking runs)
 mlflow ui --backend-store-uri sqlite:///ml/mlflow.db --workers 1
 ```
 

@@ -1,0 +1,3 @@
+/* Reset only. Everything visual lives in App.css. */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
