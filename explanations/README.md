@@ -18,3 +18,4 @@ choice is recorded while it is still fresh rather than reconstructed afterwards.
 | 05 | Tests | [sprint-05.md](sprint-05.md) |
 | 06 | Per-aspect attention pooling | [sprint-06.md](sprint-06.md) |
 | 07 | MAMS-ACSA supplementary data | [sprint-07.md](sprint-07.md) |
+| 08 | React frontend | [sprint-08.md](sprint-08.md) |
