@@ -20,3 +20,4 @@ choice is recorded while it is still fresh rather than reconstructed afterwards.
 | 07 | MAMS-ACSA supplementary data | [sprint-07.md](sprint-07.md) |
 | 08 | React frontend | [sprint-08.md](sprint-08.md) |
 | 09 | Docker and CI/CD | [sprint-09.md](sprint-09.md) |
+| 10 | Documentation | [sprint-10.md](sprint-10.md) |
