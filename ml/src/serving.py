@@ -48,7 +48,7 @@ class ABSAModel(mlflow.pyfunc.PythonModel):
         # class is reconstructed inside MLflow's environment, where model.py is
         # only importable after MLflow has put its code/ directory on sys.path —
         # which happens after this module is first imported.
-        from transformers import AutoTokenizer
+        from transformers import AutoConfig, AutoTokenizer
 
         from model import AspectSentimentModel
 
@@ -56,9 +56,17 @@ class ABSAModel(mlflow.pyfunc.PythonModel):
         self.metadata = json.loads((model_dir / "metadata.json").read_text())
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
 
+        # config.json lets the encoder be built without contacting the Hub —
+        # from_pretrained would download 250 MB of weights that load_state_dict
+        # replaces on the next line.
+        config_path = model_dir / "config.json"
+        encoder_config = (
+            AutoConfig.from_pretrained(model_dir) if config_path.is_file() else None
+        )
         self.model = AspectSentimentModel(
             encoder_name=self.metadata["encoder"],
             pooling=self.metadata.get("pooling", "cls"),
+            encoder_config=encoder_config,
         )
         self.model.load_state_dict(
             torch.load(model_dir / "model.pt", map_location="cpu", weights_only=True)

@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoConfig, AutoTokenizer
 
 from model import AspectSentimentModel, predict
 
@@ -51,9 +51,17 @@ def load_model(
     # pooling defaults to "cls" for artifacts written before it was recorded.
     # Guessing wrong here does not error — it silently loads a state dict into
     # the wrong architecture — so the default matches what those artifacts were.
+    # config.json in the artifact means we can build the architecture without
+    # contacting the Hub. Artifacts written before this existed fall back to
+    # from_pretrained, which still works wherever there is a network.
+    config_path = model_dir / "config.json"
+    encoder_config = (
+        AutoConfig.from_pretrained(model_dir) if config_path.is_file() else None
+    )
     model = AspectSentimentModel(
         encoder_name=metadata["encoder"],
         pooling=metadata.get("pooling", "cls"),
+        encoder_config=encoder_config,
     )
     state = torch.load(model_dir / "model.pt", map_location=device, weights_only=True)
     model.load_state_dict(state)

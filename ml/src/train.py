@@ -318,6 +318,11 @@ def save_artifact(
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     torch.save(model.state_dict(), OUTPUT_DIR / "model.pt")
     tokenizer.save_pretrained(OUTPUT_DIR)
+    # The encoder's architecture description. Without it, loading the artifact
+    # has to call from_pretrained, which reaches out to the HuggingFace Hub for
+    # weights that load_state_dict then immediately replaces. Saving ~1 KB of
+    # JSON here is what makes the artifact loadable with no network at all.
+    model.encoder.config.save_pretrained(OUTPUT_DIR)
 
     metadata = {
         "encoder": ENCODER_NAME,

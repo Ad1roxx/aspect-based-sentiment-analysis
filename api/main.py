@@ -13,6 +13,7 @@ healthy to everything except its users.
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, status
@@ -29,14 +30,28 @@ from api.service import service
 
 logger = logging.getLogger("absa.api")
 
-# Explicit origins, not "*". The React dev server runs on 5173 (Vite) and CRA on
-# 3000. A wildcard would work today and become a finding in any security review,
-# so the allowed list is stated even though this API holds no secrets.
-ALLOWED_ORIGINS = [
+# Explicit origins, not "*". A wildcard would work today and become a finding in
+# any security review, so the list is stated even though this API holds no
+# secrets.
+#
+# Overridable via ALLOWED_ORIGINS (comma-separated) because the correct value is
+# a deployment fact, not a code fact. The defaults cover the Vite dev server
+# (5173) and the containerised page nginx serves (8080) — that second one was
+# missing at first, and the failure mode is worth knowing: the page loads
+# perfectly and every request fails, visible only in the browser console. curl
+# does not enforce CORS, so nothing in a terminal test would have caught it.
+DEFAULT_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+]
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", ",".join(DEFAULT_ORIGINS)).split(",")
+    if origin.strip()
 ]
 
 

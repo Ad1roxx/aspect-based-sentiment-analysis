@@ -58,6 +58,10 @@ ml/reports/
 # record lives in the MLflow run, not in Git. Git LFS would be the option if we
 # ever needed to version weights directly.
 ml/models/
+# ...but keep the directory itself, so Dockerfile.api's COPY has something to
+# copy on a fresh clone. Without this the image build fails in CI, where the
+# 254 MB artifact does not exist.
+!ml/models/.gitkeep
 *.bin
 *.safetensors
 *.pt

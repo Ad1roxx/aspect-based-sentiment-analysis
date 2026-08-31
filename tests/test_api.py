@@ -248,3 +248,20 @@ class TestRootRedirect:
         """A human convenience, deliberately kept out of the schema the frontend
         generates against."""
         assert "/" not in client.get("/openapi.json").json()["paths"]
+
+
+class TestContainerOrigin:
+    """The containerised page is served by nginx on :8080, not the Vite dev
+    server on :5173. That origin was missing from the original list, and the
+    failure is invisible from a terminal — curl does not enforce CORS, so the
+    page loads and every request fails only in the browser."""
+
+    def test_containerised_page_origin_is_allowed(self, client):
+        response = client.options(
+            "/predict",
+            headers={
+                "Origin": "http://localhost:8080",
+                "Access-Control-Request-Method": "POST",
+            },
+        )
+        assert response.headers.get("access-control-allow-origin") == "http://localhost:8080"

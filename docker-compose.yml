@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Run the whole thing:
+#
+#     docker compose up --build
+#
+#     API   http://localhost:8000/docs
+#     page  http://localhost:8080
+#
+# Requires a trained artifact in ml/models/absa-distilbert/ — it is gitignored
+# and ~254 MB, so it has to be built locally first:
+#
+#     python ml/src/train.py --extra-data relabelled --pooling attention \
+#         --class-weights sqrt-inverse --eval-test --register
+# ---------------------------------------------------------------------------
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Must be reachable from the BROWSER, which runs on the host and is not
+        # part of this network. "http://api:8000" would resolve between these
+        # two containers and fail in the page — see frontend/Dockerfile.
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "8080:80"
+    depends_on:
+      # Waits for the API to report healthy, not merely to have started. The
+      # model takes seconds to load, and "started" would let the page come up
+      # against a service that cannot yet answer.
+      api:
+        condition: service_healthy
+    restart: unless-stopped

@@ -1,0 +1,84 @@
+# ---------------------------------------------------------------------------
+# ABSA API — FastAPI + DistilBERT, CPU only.
+#
+#     docker build -f Dockerfile.api -t absa-api .
+#     docker run -p 8000:8000 absa-api
+#
+# Two stages. The builder installs dependencies into a virtualenv; the runtime
+# copies that venv across and nothing else. The result is that pip, its caches,
+# and every build tool stay out of the shipped image.
+# ---------------------------------------------------------------------------
+
+FROM python:3.11-slim AS builder
+
+# Build wheels for anything without a prebuilt one. Removed in the runtime stage.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# torch first, from PyTorch's CPU index, as its own layer.
+#
+# Two reasons this is separate. First, plain `pip install torch` resolves to the
+# CUDA build from PyPI — 8.4 GB of GPU kernels this container will never call —
+# so the CPU index has to be named explicitly. Second, torch is by far the
+# largest layer, and isolating it means editing requirements-serve.txt does not
+# re-download it.
+RUN pip install --no-cache-dir torch==2.13.0 \
+      --index-url https://download.pytorch.org/whl/cpu
+
+COPY requirements-serve.txt .
+RUN pip install --no-cache-dir -r requirements-serve.txt
+
+
+# ---------------------------------------------------------------------------
+FROM python:3.11-slim AS runtime
+
+# Run as a non-root user. A container process that does not need root should not
+# have it — if the app is ever compromised, this is the difference between an
+# attacker inside a sandbox and one with the run of the filesystem.
+RUN useradd --create-home --uid 1000 absa
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    # transformers would otherwise try to reach the Hub on first load. The
+    # tokenizer is baked in beside the weights, so the container must not need
+    # a network at all.
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1
+
+COPY --chown=absa:absa api/ ./api/
+COPY --chown=absa:absa ml/src/ ./ml/src/
+
+# The trained artifact: weights, tokenizer and metadata.json (~254 MB).
+#
+# It is gitignored, so it cannot come from the repo — it has to be present in
+# the build context, which means training locally first:
+#
+#     python ml/src/train.py --extra-data relabelled --pooling attention \
+#         --class-weights sqrt-inverse --eval-test --register
+#
+# In a real pipeline this step would pull a chosen version from the MLflow
+# registry instead, which is exactly the build-time-source-of-truth design in
+# explanations/sprint-04.md. Copying the directory rather than the files means
+# the build still succeeds when it is absent; the container then fails at
+# startup with predict.load_model's existing message, which is a far clearer
+# failure than a missing-file error mid-build.
+COPY --chown=absa:absa ml/models/ ./ml/models/
+
+USER absa
+EXPOSE 8000
+
+# Reports on the MODEL, not just the web server — /health returns
+# model_loaded, so a process that started without weights is correctly
+# marked unhealthy rather than passing because it answered at all.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD python -c "import urllib.request,json,sys; \
+sys.exit(0 if json.load(urllib.request.urlopen('http://127.0.0.1:8000/health'))['model_loaded'] else 1)"
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

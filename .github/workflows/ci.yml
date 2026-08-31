@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # -------------------------------------------------------------------------
+  # 124 of the 146 tests need no GPU, no network and no trained artifact. That
+  # was the whole point of layering the suite in sprint 5 — the integration
+  # tests are marked and skip themselves when ml/models/ is empty, which on a
+  # fresh clone it always is.
+  # -------------------------------------------------------------------------
+  test:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CPU torch
+        # requirements.txt pins torch==2.13.0+cu126 — 8.4 GB of CUDA kernels for
+        # a runner with no GPU. Install the CPU wheel first so the pin below is
+        # already satisfied and pip never reaches for the CUDA build.
+        run: pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install remaining dependencies
+        # Strip the torch pin and PyTorch's CUDA index from requirements.txt;
+        # everything else installs normally from PyPI.
+        run: |
+          grep -vE '^torch==|download\.pytorch\.org' requirements.txt > /tmp/req-ci.txt
+          pip install -r /tmp/req-ci.txt -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest -m "not integration" -q --cov --cov-report=term
+
+  # -------------------------------------------------------------------------
+  frontend:
+    name: Frontend lint and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # `npm ci` rather than `npm install`: it installs exactly the lockfile and
+      # fails if package.json and the lockfile disagree, which is what you want
+      # in CI and not what you want locally.
+      - run: npm ci
+      - run: npx oxlint src
+      - run: npm run build
+
+  # -------------------------------------------------------------------------
+  # Catches broken Dockerfiles and dependency drift. It can only prove the
+  # images BUILD, not that they serve: the 254 MB artifact is gitignored, so the
+  # API image here contains no model and the container would exit at startup
+  # with predict.load_model's error. Stated rather than implied.
+  # -------------------------------------------------------------------------
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.api
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          build-args: VITE_API_URL=http://localhost:8000
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

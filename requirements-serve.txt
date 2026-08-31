@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Serving dependencies — what the API container actually needs.
+#
+#     pip install -r requirements-serve.txt
+#
+# This is requirements.txt minus everything that only exists to TRAIN or
+# EVALUATE a model. The serving path imports exactly four third-party packages:
+# fastapi, pydantic, torch and transformers. Nothing else is reachable from
+# api/main.py, which is why nothing else is here.
+#
+# What is deliberately absent, and how much it saves:
+#
+#   torch +cu126 -> CPU     ~8,451 MB  the CUDA build ships GPU kernels the
+#                                      container will never call. Inference is
+#                                      CPU-only by design (see api/service.py).
+#   scikit-learn + scipy      ~345 MB  metrics, used by evaluation.py only
+#   mlflow and its deps       ~195 MB  Flask, Alembic, SQLAlchemy, GraphQL,
+#                                      Docker SDK — none of it serves a request
+#   pandas                    ~140 MB  not imported by the serving path at all
+#   matplotlib                 ~66 MB  confusion-matrix figures
+#
+# Roughly 9.5 GB -> ~1.2 GB. Every package in a production image is also attack
+# surface and something to keep patched, so the smaller list is a security
+# argument as much as a size one.
+#
+# NOTE ON TORCH: it is NOT listed below. pip would resolve `torch==2.13.0` from
+# PyPI, which is the CUDA build. The CPU wheel lives on PyTorch's own index and
+# has to be installed from there explicitly, so the Dockerfile does it as a
+# separate step:
+#
+#     pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+#
+# Splitting it also means the torch layer caches independently of the rest,
+# which matters when it is by far the largest thing in the image.
+# ---------------------------------------------------------------------------
+
+transformers==5.14.1
+
+fastapi==0.141.1
+uvicorn==0.52.3
+pydantic==2.13.4

@@ -21,7 +21,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoConfig, AutoModel, AutoTokenizer
 
 from data import ASPECTS, IGNORE_INDEX, LABEL_NAMES, NUM_CLASSES
 
@@ -86,12 +86,27 @@ class AspectSentimentModel(nn.Module):
         num_classes: int = NUM_CLASSES,
         dropout: float = 0.1,
         pooling: str = DEFAULT_POOLING,
+        encoder_config=None,
     ) -> None:
         super().__init__()
         if pooling not in POOLING_MODES:
             raise ValueError(f"unknown pooling {pooling!r}; choose from {POOLING_MODES}")
 
-        self.encoder = AutoModel.from_pretrained(encoder_name)
+        # from_config when the caller has one, from_pretrained otherwise.
+        #
+        # This matters more than it looks. from_pretrained DOWNLOADS the base
+        # encoder from the HuggingFace Hub — and load_state_dict then overwrites
+        # every one of those weights with ours. So at serving time it fetched
+        # 250 MB over the network purely to obtain an architecture we already
+        # know, and the artifact was not self-contained at all. That surfaced
+        # only when the container ran with HF_HUB_OFFLINE=1 and failed to start.
+        #
+        # Training still uses from_pretrained: fine-tuning genuinely needs the
+        # pretrained weights. Loading a finished artifact does not.
+        if encoder_config is not None:
+            self.encoder = AutoModel.from_config(encoder_config)
+        else:
+            self.encoder = AutoModel.from_pretrained(encoder_name)
         self.num_aspects = num_aspects
         self.num_classes = num_classes
         self.pooling = pooling
